@@ -1,0 +1,8 @@
+{
+  "name": "@craigmiller160/react-keycloak",
+  "version": "1.0.0-beta",
+  "sideEffects": false,
+  "devDependencies": {
+    "typescript": "^4.9.4"
+  }
+}
