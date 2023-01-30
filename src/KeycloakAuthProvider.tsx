@@ -1,13 +1,16 @@
-/// <reference types="vite/client" />
 import { PropsWithChildren, useEffect } from 'react';
 import Keycloak from 'keycloak-js';
-import { BEARER_TOKEN_KEY } from '@craigmiller160/ajax-api';
-import { Updater, useImmer } from 'use-immer';
 import { KeycloakAuth, KeycloakAuthContext } from './KeycloakAuthContext';
 
-type KeycloakState = Omit<KeycloakAuth, 'logout'>;
+type Props = {
+	readonly accessTokenExpirationSecs: number;
+	readonly realm: string;
+	readonly authServerUrl: string;
+	readonly clientId: string;
+	readonly bearerTokenLocalStorageKey: string;
+}
 
-const ACCESS_TOKEN_EXP_SECS = 300;
+type KeycloakState = Omit<KeycloakAuth, 'logout'>;
 
 const getRealm = (): string => {
 	if (process.env.NODE_ENV !== 'test') {
