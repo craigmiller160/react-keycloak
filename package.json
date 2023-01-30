@@ -9,6 +9,9 @@
   "lint-staged": {
     "*.{ts,tsx}": "eslint --fix --max-warnings=0"
   },
+  "peerDependencies": {
+    "react": "^18.2.0"
+  },
   "devDependencies": {
     "@craigmiller160/babel-config": "^1.1.1",
     "@craigmiller160/eslint-config-js": "^1.0.1",
@@ -19,6 +22,7 @@
     "@craigmiller160/prettier-config": "^1.0.1",
     "husky": "^8.0.3",
     "lint-staged": "^13.1.0",
+    "react": "^18.2.0",
     "typescript": "^4.9.4"
   }
 }
