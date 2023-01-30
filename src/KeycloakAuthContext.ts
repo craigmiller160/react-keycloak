@@ -1,10 +1,10 @@
 import { createContext } from 'react';
 
-type AuthStatus = 'pre-auth' | 'authorizing' | 'post-auth';
+export type KeycloakAuthStatus = 'pre-auth' | 'authorizing' | 'post-auth';
 
 export type KeycloakAuth = {
 	readonly isAuthorized: boolean;
-	readonly authStatus: AuthStatus;
+	readonly authStatus: KeycloakAuthStatus;
 	readonly logout: () => void;
 };
 
