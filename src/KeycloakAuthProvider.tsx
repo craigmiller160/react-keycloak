@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useState } from 'react';
+import { Dispatch, PropsWithChildren, useEffect, useState } from 'react';
 import Keycloak from 'keycloak-js';
 import { KeycloakAuth, KeycloakAuthContext } from './KeycloakAuthContext';
 
@@ -33,7 +33,9 @@ const handleKeycloakResult =
 	};
 
 const initializeKeycloak = (
-	updateAuth: Updater<KeycloakState>
+	keycloak: Keycloak,
+	accessTokenExpirationSecs: number,
+	updateAuth: Dispatch<KeycloakState>
 ): Promise<void> => {
 	const promise = keycloak
 		.init({ onLoad: 'login-required' })
@@ -42,10 +44,10 @@ const initializeKeycloak = (
 
 	setInterval(() => {
 		keycloak
-			.updateToken(ACCESS_TOKEN_EXP_SECS - 70)
+			.updateToken(accessTokenExpirationSecs - 70)
 			.then(handleKeycloakResult(updateAuth))
 			.catch((ex) => console.error('Keycloak Refresh Error', ex));
-	}, (ACCESS_TOKEN_EXP_SECS - 60) * 1000);
+	}, (accessTokenExpirationSecs - 60) * 1000);
 
 	return promise;
 };
@@ -63,9 +65,18 @@ export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
 				checkStatus: 'checking'
 			}));
 		} else if (state.checkStatus === 'checking') {
-			initializeKeycloak(setState);
+			initializeKeycloak(
+				state.keycloak,
+				props.accessTokenExpirationSecs,
+				setState
+			);
 		}
-	}, [setState, state.checkStatus]);
+	}, [
+		setState,
+		state.checkStatus,
+		props.accessTokenExpirationSecs,
+		state.keycloak
+	]);
 
 	const authValue: KeycloakAuth = {
 		logout: state.keycloak.logout,
