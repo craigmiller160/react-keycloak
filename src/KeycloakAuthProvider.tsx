@@ -22,24 +22,37 @@ const createKeycloak = (props: Props): Keycloak =>
 	});
 
 const handleKeycloakResult =
-	(updateAuth: Updater<KeycloakState>) => (isSuccess: boolean) => {
+	(
+		keycloak: Keycloak,
+		bearerTokenLocalStorageKey: string,
+		updateAuth: Dispatch<KeycloakState>
+	) =>
+	(isSuccess: boolean) => {
 		if (isSuccess && keycloak.token) {
-			localStorage.setItem(BEARER_TOKEN_KEY, keycloak.token);
+			localStorage.setItem(bearerTokenLocalStorageKey, keycloak.token);
 		}
-		updateAuth((draft) => {
-			draft.checkStatus = 'post-check';
-			draft.isAuthorized = isSuccess;
-		});
+		updateAuth((prevState) => ({
+			...prevState,
+			checkStatus: 'post-check',
+			isAuthorized: isSuccess
+		}));
 	};
 
 const initializeKeycloak = (
 	keycloak: Keycloak,
 	accessTokenExpirationSecs: number,
+	bearerTokenLocalStorageKey: string,
 	updateAuth: Dispatch<KeycloakState>
 ): Promise<void> => {
 	const promise = keycloak
 		.init({ onLoad: 'login-required' })
-		.then(handleKeycloakResult(updateAuth))
+		.then(
+			handleKeycloakResult(
+				keycloak,
+				bearerTokenLocalStorageKey,
+				updateAuth
+			)
+		)
 		.catch((ex) => console.error('Keycloak Authentication Error', ex));
 
 	setInterval(() => {
@@ -68,6 +81,7 @@ export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
 			initializeKeycloak(
 				state.keycloak,
 				props.accessTokenExpirationSecs,
+				props.bearerTokenLocalStorageKey,
 				setState
 			);
 		}
@@ -75,6 +89,7 @@ export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
 		setState,
 		state.checkStatus,
 		props.accessTokenExpirationSecs,
+		props.bearerTokenLocalStorageKey,
 		state.keycloak
 	]);
 
