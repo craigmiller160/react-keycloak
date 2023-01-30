@@ -3,6 +3,12 @@
   "version": "1.0.0-beta",
   "sideEffects": false,
   "devDependencies": {
+    "@craigmiller160/eslint-config-js": "^1.0.1",
+    "@craigmiller160/eslint-config-prettier": "^1.0.1",
+    "@craigmiller160/eslint-config-react": "^1.0.2",
+    "@craigmiller160/eslint-config-tree-shaking-import-restrictions": "^1.0.1",
+    "@craigmiller160/eslint-config-ts": "^1.1.0",
+    "@craigmiller160/prettier-config": "^1.0.1",
     "typescript": "^4.9.4"
   }
 }
