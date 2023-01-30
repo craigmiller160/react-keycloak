@@ -39,7 +39,7 @@ const handleKeycloakResult =
 		}
 		updateAuth((prevState) => ({
 			...prevState,
-			checkStatus: 'post-check',
+			authStatus: 'post-auth',
 			isAuthorized: isSuccess
 		}));
 	};
@@ -80,16 +80,16 @@ const initializeKeycloak = (
 export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
 	const [state, setState] = useState<KeycloakState>({
 		isAuthorized: false,
-		checkStatus: 'pre-check',
+		authStatus: 'pre-auth',
 		keycloak: createKeycloak(props)
 	});
 	useEffect(() => {
-		if (state.checkStatus === 'pre-check') {
+		if (state.authStatus === 'pre-auth') {
 			setState((prevState) => ({
 				...prevState,
-				checkStatus: 'checking'
+				authStatus: 'authorizing'
 			}));
-		} else if (state.checkStatus === 'checking') {
+		} else if (state.authStatus === 'authorizing') {
 			initializeKeycloak(
 				state.keycloak,
 				props.accessTokenExpirationSecs,
@@ -99,7 +99,7 @@ export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
 		}
 	}, [
 		setState,
-		state.checkStatus,
+		state.authStatus,
 		props.accessTokenExpirationSecs,
 		props.bearerTokenLocalStorageKey,
 		state.keycloak
@@ -107,7 +107,7 @@ export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
 
 	const authValue: KeycloakAuth = {
 		logout: state.keycloak.logout,
-		checkStatus: state.checkStatus,
+		authStatus: state.authStatus,
 		isAuthorized: state.isAuthorized
 	};
 

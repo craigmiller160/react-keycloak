@@ -1,16 +1,16 @@
 import { createContext } from 'react';
 
-type CheckStatus = 'pre-check' | 'checking' | 'post-check';
+type AuthStatus = 'pre-auth' | 'authorizing' | 'post-auth';
 
 export type KeycloakAuth = {
 	readonly isAuthorized: boolean;
-	readonly checkStatus: CheckStatus;
+	readonly authStatus: AuthStatus;
 	readonly logout: () => void;
 };
 
 export const KeycloakAuthContext = createContext<KeycloakAuth>({
 	isAuthorized: false,
-	checkStatus: 'pre-check',
+	authStatus: 'pre-auth',
 	// eslint-disable-next-line @typescript-eslint/no-empty-function
 	logout: () => {}
 });
