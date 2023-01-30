@@ -14,3 +14,4 @@ deploy/build
 deploy/chart/charts
 *.tgz
 deploy/terraform/.terraform/
+/lib
