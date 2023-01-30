@@ -1,4 +1,10 @@
-import { Dispatch, PropsWithChildren, useEffect, useState } from 'react';
+import {
+	Dispatch,
+	PropsWithChildren,
+	SetStateAction,
+	useEffect,
+	useState
+} from 'react';
 import Keycloak from 'keycloak-js';
 import { KeycloakAuth, KeycloakAuthContext } from './KeycloakAuthContext';
 
@@ -25,7 +31,7 @@ const handleKeycloakResult =
 	(
 		keycloak: Keycloak,
 		bearerTokenLocalStorageKey: string,
-		updateAuth: Dispatch<KeycloakState>
+		updateAuth: Dispatch<SetStateAction<KeycloakState>>
 	) =>
 	(isSuccess: boolean) => {
 		if (isSuccess && keycloak.token) {
@@ -42,7 +48,7 @@ const initializeKeycloak = (
 	keycloak: Keycloak,
 	accessTokenExpirationSecs: number,
 	bearerTokenLocalStorageKey: string,
-	updateAuth: Dispatch<KeycloakState>
+	updateAuth: Dispatch<SetStateAction<KeycloakState>>
 ): Promise<void> => {
 	const promise = keycloak
 		.init({ onLoad: 'login-required' })
@@ -58,7 +64,13 @@ const initializeKeycloak = (
 	setInterval(() => {
 		keycloak
 			.updateToken(accessTokenExpirationSecs - 70)
-			.then(handleKeycloakResult(updateAuth))
+			.then(
+				handleKeycloakResult(
+					keycloak,
+					bearerTokenLocalStorageKey,
+					updateAuth
+				)
+			)
 			.catch((ex) => console.error('Keycloak Refresh Error', ex));
 	}, (accessTokenExpirationSecs - 60) * 1000);
 
