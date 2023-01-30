@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect } from 'react';
+import { PropsWithChildren, useEffect, useState } from 'react';
 import Keycloak from 'keycloak-js';
 import { KeycloakAuth, KeycloakAuthContext } from './KeycloakAuthContext';
 
@@ -8,23 +8,18 @@ type Props = {
 	readonly authServerUrl: string;
 	readonly clientId: string;
 	readonly bearerTokenLocalStorageKey: string;
-}
-
-type KeycloakState = Omit<KeycloakAuth, 'logout'>;
-
-const getRealm = (): string => {
-	if (process.env.NODE_ENV !== 'test') {
-		return import.meta.env.VITE_KEYCLOAK_REALM;
-	}
-	return '';
 };
 
-const keycloak = new Keycloak({
-	url: 'https://auth-craigmiller160.ddns.net/',
-	realm: getRealm(),
-	clientId: 'expense-tracker-ui'
-});
-const logout = () => keycloak.logout();
+type KeycloakState = Omit<KeycloakAuth, 'logout'> & {
+	readonly keycloak: Keycloak;
+};
+
+const createKeycloak = (props: Props): Keycloak =>
+	new Keycloak({
+		url: props.authServerUrl,
+		realm: props.realm,
+		clientId: props.clientId
+	});
 
 const handleKeycloakResult =
 	(updateAuth: Updater<KeycloakState>) => (isSuccess: boolean) => {
@@ -55,24 +50,27 @@ const initializeKeycloak = (
 	return promise;
 };
 
-export const KeycloakAuthProvider = (props: PropsWithChildren) => {
-	const [state, setState] = useImmer<KeycloakState>({
+export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
+	const [state, setState] = useState<KeycloakState>({
 		isAuthorized: false,
-		checkStatus: 'pre-check'
+		checkStatus: 'pre-check',
+		keycloak: createKeycloak(props)
 	});
 	useEffect(() => {
 		if (state.checkStatus === 'pre-check') {
-			setState((draft) => {
-				draft.checkStatus = 'checking';
-			});
+			setState((prevState) => ({
+				...prevState,
+				checkStatus: 'checking'
+			}));
 		} else if (state.checkStatus === 'checking') {
 			initializeKeycloak(setState);
 		}
 	}, [setState, state.checkStatus]);
 
-	const authValue = {
-		...state,
-		logout
+	const authValue: KeycloakAuth = {
+		logout: state.keycloak.logout,
+		checkStatus: state.checkStatus,
+		isAuthorized: state.isAuthorized
 	};
 
 	return (
