@@ -108,7 +108,8 @@ export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
 	const authValue: KeycloakAuth = {
 		logout: state.keycloak.logout,
 		authStatus: state.authStatus,
-		isAuthorized: state.isAuthorized
+		isAuthorized: state.isAuthorized,
+		token: state.keycloak.tokenParsed
 	};
 
 	return (
