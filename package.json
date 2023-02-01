@@ -33,7 +33,8 @@
     "husky": "^8.0.3",
     "lint-staged": "^13.1.0",
     "react": "^18.2.0",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.4",
+    "vitest": "^0.28.3"
   },
   "dependencies": {
     "keycloak-js": "^20.0.3"
