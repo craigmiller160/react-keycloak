@@ -8,7 +8,7 @@ import {
 import Keycloak from 'keycloak-js';
 import { KeycloakAuth, KeycloakAuthContext } from './KeycloakAuthContext';
 
-type RequiredRoles = {
+export type RequiredRoles = {
 	readonly realm: ReadonlyArray<string>;
 	readonly client: Record<string, ReadonlyArray<string>>;
 };
