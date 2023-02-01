@@ -8,12 +8,18 @@ import {
 import Keycloak from 'keycloak-js';
 import { KeycloakAuth, KeycloakAuthContext } from './KeycloakAuthContext';
 
+type RequiredRoles = {
+	readonly realm: ReadonlyArray<string>;
+	readonly client: Record<string, ReadonlyArray<string>>;
+};
+
 type Props = {
 	readonly accessTokenExpirationSecs: number;
 	readonly realm: string;
 	readonly authServerUrl: string;
 	readonly clientId: string;
 	readonly bearerTokenLocalStorageKey: string;
+	readonly requiredRoles?: Partial<RequiredRoles>;
 };
 
 type KeycloakState = Omit<KeycloakAuth, 'logout'> & {
