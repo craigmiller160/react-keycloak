@@ -11,4 +11,9 @@ export class MockKeycloak {
 		MockKeycloak.lastInit = options;
 		return new Promise((resolve) => resolve(true));
 	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	updateToken(minValidity: number): Promise<boolean> {
+		return new Promise((resolve) => resolve(true));
+	}
 }
