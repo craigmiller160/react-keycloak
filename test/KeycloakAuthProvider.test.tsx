@@ -44,9 +44,11 @@ const doRender = () =>
 describe('KeycloakAuthProvider', () => {
 	beforeEach(() => {
 		MockKeycloak.reset();
+		localStorage.clear();
 	});
 
 	it('handles a successful authentication', async () => {
+		MockKeycloak.authSuccess = true;
 		doRender();
 		await waitFor(() =>
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
@@ -63,8 +65,22 @@ describe('KeycloakAuthProvider', () => {
 		expect(screen.getByText(/Auth Status/)).toHaveTextContent('post-auth');
 	});
 
-	it('handles a failed authentication', () => {
-		throw new Error();
+	it('handles a failed authentication', async () => {
+		MockKeycloak.authSuccess = true;
+		doRender();
+		await waitFor(() =>
+			expect(MockKeycloak.lastConfig).not.toBeUndefined()
+		);
+		expect(MockKeycloak.lastConfig).toEqual({
+			url: AUTH_SERVER_URL,
+			realm: REALM,
+			clientId: CLIENT_ID
+		});
+		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toBeUndefined();
+		await waitFor(() =>
+			expect(screen.getByText(/Is Authorized/)).toHaveTextContent('false')
+		);
+		expect(screen.getByText(/Auth Status/)).toHaveTextContent('post-auth');
 	});
 
 	it('handles a successful authentication with the required roles', () => {
