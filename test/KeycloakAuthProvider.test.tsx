@@ -1,6 +1,13 @@
-import { describe, it } from 'vitest';
+import { describe, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { KeycloakAuthProvider } from '../src';
+import { MockKeycloak } from './mocks/MockKeycloak';
+
+vi.mock('keycloak-js', () => {
+	return {
+		default: MockKeycloak
+	};
+});
 
 const CLIENT_ID = 'test-client';
 const AUTH_SERVER_URL = 'https://auth-server.com';
