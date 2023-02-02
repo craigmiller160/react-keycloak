@@ -30,7 +30,6 @@
     "@craigmiller160/eslint-config-tree-shaking-import-restrictions": "^1.0.1",
     "@craigmiller160/eslint-config-ts": "^1.1.0",
     "@craigmiller160/prettier-config": "^1.0.1",
-    "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@types/react": "^18.0.27",
     "@vitejs/plugin-react": "^3.0.1",
