@@ -55,8 +55,8 @@ const initializeKeycloak = (
 	accessTokenExpirationSecs: number,
 	bearerTokenLocalStorageKey: string,
 	updateAuth: Dispatch<SetStateAction<KeycloakState>>
-): Promise<void> => {
-	const promise = keycloak
+): number => {
+	keycloak
 		.init({ onLoad: 'login-required' })
 		.then(
 			handleKeycloakResult(
@@ -67,7 +67,7 @@ const initializeKeycloak = (
 		)
 		.catch((ex) => console.error('Keycloak Authentication Error', ex));
 
-	setInterval(() => {
+	const interval = window.setInterval(() => {
 		keycloak
 			.updateToken(accessTokenExpirationSecs - 70)
 			.then(
@@ -80,7 +80,7 @@ const initializeKeycloak = (
 			.catch((ex) => console.error('Keycloak Refresh Error', ex));
 	}, (accessTokenExpirationSecs - 60) * 1000);
 
-	return promise;
+	return interval;
 };
 
 export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
@@ -90,19 +90,26 @@ export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
 		keycloak: createKeycloak(props)
 	});
 	useEffect(() => {
+		let interval: number | undefined = undefined;
 		if (state.authStatus === 'pre-auth') {
 			setState((prevState) => ({
 				...prevState,
 				authStatus: 'authorizing'
 			}));
 		} else if (state.authStatus === 'authorizing') {
-			initializeKeycloak(
+			interval = initializeKeycloak(
 				state.keycloak,
 				props.accessTokenExpirationSecs,
 				props.bearerTokenLocalStorageKey,
 				setState
 			);
 		}
+
+		return () => {
+			if (interval) {
+				clearInterval(interval);
+			}
+		};
 	}, [
 		setState,
 		state.authStatus,
