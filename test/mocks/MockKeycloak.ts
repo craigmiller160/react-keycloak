@@ -4,7 +4,15 @@ export const DEFAULT_TOKEN = 'ABCDEFG';
 
 export class MockKeycloak {
 	static lastConfig?: KeycloakConfig = undefined;
-	static lastInit?: KeycloakInitOptions;
+	static lastInit?: KeycloakInitOptions = undefined;
+	static authSuccess = false;
+
+	static reset() {
+		MockKeycloak.lastConfig = undefined;
+		MockKeycloak.lastInit = undefined;
+		MockKeycloak.authSuccess = false;
+	}
+
 	token: string;
 	constructor(config: KeycloakConfig) {
 		MockKeycloak.lastConfig = config;
@@ -13,7 +21,7 @@ export class MockKeycloak {
 
 	init(options: KeycloakInitOptions): Promise<boolean> {
 		MockKeycloak.lastInit = options;
-		return new Promise((resolve) => resolve(true));
+		return new Promise((resolve) => resolve(MockKeycloak.authSuccess));
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars

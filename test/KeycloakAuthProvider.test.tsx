@@ -1,4 +1,4 @@
-import { describe, it, vi, expect } from 'vitest';
+import { describe, it, vi, expect, beforeEach } from 'vitest';
 import { render, waitFor, screen } from '@testing-library/react';
 import { KeycloakAuthContext, KeycloakAuthProvider } from '../src';
 import { DEFAULT_TOKEN, MockKeycloak } from './mocks/MockKeycloak';
@@ -14,7 +14,7 @@ vi.mock('keycloak-js', async () => {
 
 const CLIENT_ID = 'test-client';
 const AUTH_SERVER_URL = 'https://auth-server.com';
-const ACCESS_TOKEN_EXP = 300;
+const ACCESS_TOKEN_EXP = 3000000;
 const REALM = 'realm';
 const LOCAL_STORAGE_KEY = 'local-storage-key';
 
@@ -42,6 +42,10 @@ const doRender = () =>
 	);
 
 describe('KeycloakAuthProvider', () => {
+	beforeEach(() => {
+		MockKeycloak.reset();
+	});
+
 	it('handles a successful authentication', async () => {
 		doRender();
 		await waitFor(() =>
