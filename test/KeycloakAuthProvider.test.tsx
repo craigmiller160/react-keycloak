@@ -19,10 +19,11 @@ const REALM = 'realm';
 const LOCAL_STORAGE_KEY = 'local-storage-key';
 
 const KeycloakRenderer = () => {
-	const { token } = useContext(KeycloakAuthContext);
+	const { isAuthorized, authStatus } = useContext(KeycloakAuthContext);
 	return (
 		<div>
-			<p>Token: {token}</p>
+			<p>Is Authorized: {isAuthorized}</p>
+			<p>Auth Status: {authStatus}</p>
 		</div>
 	);
 };
@@ -52,7 +53,10 @@ describe('KeycloakAuthProvider', () => {
 			clientId: CLIENT_ID
 		});
 		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toEqual(DEFAULT_TOKEN);
-		expect(screen.getByText(/Token/)).toHaveTextContent(DEFAULT_TOKEN);
+		await waitFor(() =>
+			expect(screen.getByText(/Is Authorized/)).toHaveTextContent('true')
+		);
+		expect(screen.getByText(/Auth Status/)).toHaveTextContent('post-auth');
 	});
 
 	it('handles a successful authentication', () => {
