@@ -42,7 +42,7 @@ const doRender = () =>
 	);
 
 describe('KeycloakAuthProvider', () => {
-	it('initializes authentication on render', async () => {
+	it('handles a successful authentication', async () => {
 		doRender();
 		await waitFor(() =>
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
@@ -57,10 +57,6 @@ describe('KeycloakAuthProvider', () => {
 			expect(screen.getByText(/Is Authorized/)).toHaveTextContent('true')
 		);
 		expect(screen.getByText(/Auth Status/)).toHaveTextContent('post-auth');
-	});
-
-	it('handles a successful authentication', () => {
-		throw new Error();
 	});
 
 	it('handles a failed authentication', () => {
