@@ -1,9 +1,10 @@
-import { describe, it, vi } from 'vitest';
-import { render } from '@testing-library/react';
+import { describe, it, vi, expect } from 'vitest';
+import { render, waitFor } from '@testing-library/react';
 import { KeycloakAuthProvider } from '../src';
 import { MockKeycloak } from './mocks/MockKeycloak';
 
 vi.mock('keycloak-js', async () => {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const mock = (await vi.importActual('./mocks/MockKeycloak')) as any;
 	return {
 		default: mock.MockKeycloak
@@ -30,8 +31,16 @@ const doRender = () =>
 	);
 
 describe('KeycloakAuthProvider', () => {
-	it('initializes authentication on render', () => {
-		throw new Error();
+	it('initializes authentication on render', async () => {
+		doRender();
+		await waitFor(() =>
+			expect(MockKeycloak.lastConfig).not.toBeUndefined()
+		);
+		expect(MockKeycloak.lastConfig).toEqual({
+			url: AUTH_SERVER_URL,
+			realm: REALM,
+			clientId: CLIENT_ID
+		});
 	});
 
 	it('handles a successful authentication', () => {
