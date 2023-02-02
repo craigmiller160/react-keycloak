@@ -3,9 +3,10 @@ import { render } from '@testing-library/react';
 import { KeycloakAuthProvider } from '../src';
 import { MockKeycloak } from './mocks/MockKeycloak';
 
-vi.mock('keycloak-js', () => {
+vi.mock('keycloak-js', async () => {
+	const mock = (await vi.importActual('./mocks/MockKeycloak')) as any;
 	return {
-		default: MockKeycloak
+		default: mock.MockKeycloak
 	};
 });
 
