@@ -66,7 +66,7 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a failed authentication', async () => {
-		MockKeycloak.authSuccess = true;
+		MockKeycloak.authSuccess = false;
 		doRender();
 		await waitFor(() =>
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
@@ -76,11 +76,15 @@ describe('KeycloakAuthProvider', () => {
 			realm: REALM,
 			clientId: CLIENT_ID
 		});
-		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toBeUndefined();
+		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toBeNull();
 		await waitFor(() =>
 			expect(screen.getByText(/Is Authorized/)).toHaveTextContent('false')
 		);
-		expect(screen.getByText(/Auth Status/)).toHaveTextContent('post-auth');
+		await waitFor(() =>
+			expect(screen.getByText(/Auth Status/)).toHaveTextContent(
+				'post-auth'
+			)
+		);
 	});
 
 	it('handles a successful authentication with the required roles', () => {
