@@ -22,7 +22,7 @@ const KeycloakRenderer = () => {
 	const { isAuthorized, authStatus } = useContext(KeycloakAuthContext);
 	return (
 		<div>
-			<p>Is Authorized: {isAuthorized}</p>
+			<p>Is Authorized: {isAuthorized ? 'true' : 'false'}</p>
 			<p>Auth Status: {authStatus}</p>
 		</div>
 	);
