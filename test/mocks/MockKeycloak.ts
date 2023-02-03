@@ -1,6 +1,14 @@
-import type { KeycloakConfig, KeycloakInitOptions } from 'keycloak-js';
+import type {
+	KeycloakConfig,
+	KeycloakInitOptions,
+	KeycloakTokenParsed
+} from 'keycloak-js';
 
 export const DEFAULT_TOKEN = 'ABCDEFG';
+
+const DEFAULT_TOKEN_PARSED: KeycloakTokenParsed = {
+	sub: 'mock-token'
+};
 
 export class MockKeycloak {
 	static lastConfig?: KeycloakConfig = undefined;
@@ -13,14 +21,19 @@ export class MockKeycloak {
 		MockKeycloak.authSuccess = false;
 	}
 
-	token: string;
+	token?: string;
+	tokenParsed?: KeycloakTokenParsed;
 	constructor(config: KeycloakConfig) {
 		MockKeycloak.lastConfig = config;
-		this.token = DEFAULT_TOKEN;
 	}
 
 	init(options: KeycloakInitOptions): Promise<boolean> {
 		MockKeycloak.lastInit = options;
+		if (MockKeycloak.authSuccess) {
+			this.token = DEFAULT_TOKEN;
+			this.tokenParsed = DEFAULT_TOKEN_PARSED;
+		}
+
 		return new Promise((resolve) => resolve(MockKeycloak.authSuccess));
 	}
 
