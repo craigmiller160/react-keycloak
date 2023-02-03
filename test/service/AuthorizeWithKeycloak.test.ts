@@ -1,12 +1,4 @@
-import { describe, it, vi } from 'vitest';
-
-vi.mock('keycloak-js', async () => {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const mock = (await vi.importActual('./mocks/MockKeycloak')) as any;
-	return {
-		default: mock.MockKeycloak
-	};
-});
+import { describe, it } from 'vitest';
 
 describe('AuthorizeWithKeycloak', () => {
 	it('handles a successful authentication', async () => {
