@@ -4,6 +4,7 @@ import { KeycloakAuthContext, KeycloakAuthProvider } from '../src';
 import { DEFAULT_TOKEN, MockKeycloak } from './mocks/MockKeycloak';
 import { useContext } from 'react';
 import { KeycloakTokenParsed } from 'keycloak-js';
+import { RequiredRoles } from '../src/KeycloakAuthProvider';
 
 vi.mock('keycloak-js', async () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -43,7 +44,7 @@ const KeycloakRenderer = () => {
 	);
 };
 
-const doRender = () =>
+const doRender = (requiredRoles?: Partial<RequiredRoles>) =>
 	render(
 		<KeycloakAuthProvider
 			accessTokenExpirationSecs={ACCESS_TOKEN_EXP}
@@ -51,6 +52,7 @@ const doRender = () =>
 			authServerUrl={AUTH_SERVER_URL}
 			clientId={CLIENT_ID}
 			bearerTokenLocalStorageKey={LOCAL_STORAGE_KEY}
+			requiredRoles={requiredRoles}
 		>
 			<KeycloakRenderer />
 		</KeycloakAuthProvider>
@@ -104,7 +106,9 @@ describe('KeycloakAuthProvider', () => {
 
 	it('handles a successful authentication with the required realm roles', async () => {
 		MockKeycloak.setAuthResult(true, tokenParsed);
-		doRender();
+		doRender({
+			realm: [REALM_ACCESS_ROLE]
+		});
 		await waitFor(() =>
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
 		);
@@ -118,7 +122,11 @@ describe('KeycloakAuthProvider', () => {
 
 	it('handles a successful authentication with the required client roles', async () => {
 		MockKeycloak.setAuthResult(true, tokenParsed);
-		doRender();
+		doRender({
+			client: {
+				[CLIENT_ID]: [CLIENT_ACCESS_ROLE]
+			}
+		});
 		await waitFor(() =>
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
 		);
@@ -132,7 +140,9 @@ describe('KeycloakAuthProvider', () => {
 
 	it('handles a successful authentication without the roles required roles', async () => {
 		MockKeycloak.setAuthResult(true, tokenParsed);
-		doRender();
+		doRender({
+			realm: ['not_there']
+		});
 		await waitFor(() =>
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
 		);
