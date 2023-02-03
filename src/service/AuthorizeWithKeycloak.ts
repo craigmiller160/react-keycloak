@@ -74,8 +74,15 @@ export const authorizeWithKeycloak = (
 		clientId: config.clientId
 	});
 	return handleAuthStep({
-		state: 'pre-auth',
+		state: 'authorizing',
 		config,
 		keycloak
-	});
+	}).then(
+		(): KeycloakAuth => ({
+			authStatus: 'authorized',
+			logout: keycloak.logout,
+			token: keycloak.token,
+			tokenParsed: keycloak.tokenParsed
+		})
+	);
 };
