@@ -84,6 +84,7 @@ const handleAuthStep = (context: AuthContext): Promise<AuthContext> => {
 	}
 };
 
+// TODO how does consuming code get updated when the token refresh changes?
 export const authorizeWithKeycloak = (
 	config: KeycloakAuthConfig
 ): Promise<KeycloakAuth> => {
