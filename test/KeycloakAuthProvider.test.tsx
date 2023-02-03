@@ -117,7 +117,11 @@ describe('KeycloakAuthProvider', () => {
 			realm: REALM,
 			clientId: CLIENT_ID
 		});
-		throw new Error();
+		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toEqual(DEFAULT_TOKEN);
+		await waitFor(() =>
+			expect(screen.getByText(/Is Authorized/)).toHaveTextContent('true')
+		);
+		expect(screen.getByText(/Auth Status/)).toHaveTextContent('post-auth');
 	});
 
 	it('handles a successful authentication with the required client roles', async () => {
@@ -135,7 +139,11 @@ describe('KeycloakAuthProvider', () => {
 			realm: REALM,
 			clientId: CLIENT_ID
 		});
-		throw new Error();
+		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toEqual(DEFAULT_TOKEN);
+		await waitFor(() =>
+			expect(screen.getByText(/Is Authorized/)).toHaveTextContent('true')
+		);
+		expect(screen.getByText(/Auth Status/)).toHaveTextContent('post-auth');
 	});
 
 	it('handles a successful authentication without the roles required roles', async () => {
@@ -151,6 +159,14 @@ describe('KeycloakAuthProvider', () => {
 			realm: REALM,
 			clientId: CLIENT_ID
 		});
-		throw new Error();
+		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toBeNull();
+		await waitFor(() =>
+			expect(screen.getByText(/Is Authorized/)).toHaveTextContent('false')
+		);
+		await waitFor(() =>
+			expect(screen.getByText(/Auth Status/)).toHaveTextContent(
+				'post-auth'
+			)
+		);
 	});
 });
