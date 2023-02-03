@@ -105,18 +105,45 @@ describe('KeycloakAuthProvider', () => {
 		);
 	});
 
-	it('handles a successful authentication with the required realm roles', () => {
+	it('handles a successful authentication with the required realm roles', async () => {
 		MockKeycloak.setAuthResult(true, tokenParsedWithRoles);
+		doRender();
+		await waitFor(() =>
+			expect(MockKeycloak.lastConfig).not.toBeUndefined()
+		);
+		expect(MockKeycloak.lastConfig).toEqual({
+			url: AUTH_SERVER_URL,
+			realm: REALM,
+			clientId: CLIENT_ID
+		});
 		throw new Error();
 	});
 
-	it('handles a successful authentication with the required client roles', () => {
+	it('handles a successful authentication with the required client roles', async () => {
 		MockKeycloak.setAuthResult(true, tokenParsedWithRoles);
+		doRender();
+		await waitFor(() =>
+			expect(MockKeycloak.lastConfig).not.toBeUndefined()
+		);
+		expect(MockKeycloak.lastConfig).toEqual({
+			url: AUTH_SERVER_URL,
+			realm: REALM,
+			clientId: CLIENT_ID
+		});
 		throw new Error();
 	});
 
-	it('handles a successful authentication without the roles required roles', () => {
+	it('handles a successful authentication without the roles required roles', async () => {
 		MockKeycloak.setAuthResult(true, tokenParsedWithRoles);
+		doRender();
+		await waitFor(() =>
+			expect(MockKeycloak.lastConfig).not.toBeUndefined()
+		);
+		expect(MockKeycloak.lastConfig).toEqual({
+			url: AUTH_SERVER_URL,
+			realm: REALM,
+			clientId: CLIENT_ID
+		});
 		throw new Error();
 	});
 });
