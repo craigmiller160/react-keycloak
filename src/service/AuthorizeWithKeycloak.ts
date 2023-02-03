@@ -53,11 +53,22 @@ const handleRoleCheck = (context: AuthContext): Promise<AuthContext> => {
 	}
 	return Promise.resolve({
 		...context,
-		state: 'authorized'
+		state: 'prepare-refresh'
 	});
 };
 
-const handlePrepareRefresh
+const handlePrepareRefresh = (context: AuthContext): Promise<AuthContext> => {
+	const refreshInterval = window.setInterval(() => {
+		context.keycloak.updateToken(
+			context.config.accessTokenExpirationSecs - 70
+		);
+		// TODO what to do with the result here?
+	}, (context.config.accessTokenExpirationSecs - 60) * 1000);
+	return Promise.resolve({
+		...context,
+		refreshInterval
+	});
+};
 
 const handleAuthStep = (context: AuthContext): Promise<AuthContext> => {
 	switch (context.state) {
@@ -65,13 +76,14 @@ const handleAuthStep = (context: AuthContext): Promise<AuthContext> => {
 			return handleAuthorizing(context).then(handleAuthStep);
 		case 'role-check':
 			return handleRoleCheck(context).then(handleAuthStep);
+		case 'prepare-refresh':
+			return handlePrepareRefresh(context).then(handleAuthStep);
 		case 'authorized':
 		default:
 			return Promise.resolve(context);
 	}
 };
 
-// TODO missing refresh
 export const authorizeWithKeycloak = (
 	config: KeycloakAuthConfig
 ): Promise<KeycloakAuth> => {
