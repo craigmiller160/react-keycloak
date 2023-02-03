@@ -22,10 +22,7 @@ const REALM_ACCESS_ROLE = 'realm-access';
 const CLIENT_ACCESS_ROLE = 'client-access';
 
 const tokenParsed: KeycloakTokenParsed = {
-	sub: 'mock-token'
-};
-const tokenParsedWithRoles: KeycloakTokenParsed = {
-	...tokenParsed,
+	sub: 'mock-token',
 	realm_access: {
 		roles: [REALM_ACCESS_ROLE]
 	},
@@ -106,7 +103,7 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a successful authentication with the required realm roles', async () => {
-		MockKeycloak.setAuthResult(true, tokenParsedWithRoles);
+		MockKeycloak.setAuthResult(true, tokenParsed);
 		doRender();
 		await waitFor(() =>
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
@@ -120,7 +117,7 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a successful authentication with the required client roles', async () => {
-		MockKeycloak.setAuthResult(true, tokenParsedWithRoles);
+		MockKeycloak.setAuthResult(true, tokenParsed);
 		doRender();
 		await waitFor(() =>
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
@@ -134,7 +131,7 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a successful authentication without the roles required roles', async () => {
-		MockKeycloak.setAuthResult(true, tokenParsedWithRoles);
+		MockKeycloak.setAuthResult(true, tokenParsed);
 		doRender();
 		await waitFor(() =>
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
