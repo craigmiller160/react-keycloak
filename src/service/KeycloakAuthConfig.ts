@@ -1,6 +1,6 @@
 export type RequiredRoles = {
 	readonly realm: ReadonlyArray<string>;
-	readonly client: Record<string, ReadonlyArray<string>>;
+	readonly client: ReadonlyArray<string>;
 };
 
 export type KeycloakAuthConfig = {

@@ -30,16 +30,15 @@ const handleRoleCheck = (context: AuthContext): Promise<AuthContext> => {
 		(role) =>
 			!context.keycloak.tokenParsed?.realm_access?.roles.includes(role)
 	);
-	const missingRequiredClientRoles = Object.entries(
-		context.config.requiredRoles?.client ?? {}
-	).flatMap(([clientId, roles]) => {
-		roles.filter(
-			(role) =>
-				!context.keycloak.tokenParsed?.resource_access?.[
-					clientId
-				].roles.includes(role)
-		);
-	});
+
+	const missingRequiredClientRoles = (
+		context.config.requiredRoles?.client ?? []
+	).filter(
+		(role) =>
+			!context.keycloak.tokenParsed?.resource_access?.[
+				context.config.clientId
+			].roles.includes(role)
+	);
 
 	if (
 		missingRequiredRealmRoles.length > 0 ||
