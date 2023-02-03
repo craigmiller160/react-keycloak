@@ -48,7 +48,7 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a successful authentication', async () => {
-		MockKeycloak.authSuccess = true;
+		MockKeycloak.setAuthResult(true, { sub: 'mock-token' });
 		doRender();
 		await waitFor(() =>
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
@@ -66,7 +66,7 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a failed authentication', async () => {
-		MockKeycloak.authSuccess = false;
+		MockKeycloak.setAuthResult(false);
 		doRender();
 		await waitFor(() =>
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()

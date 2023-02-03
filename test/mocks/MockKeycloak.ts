@@ -13,12 +13,27 @@ const DEFAULT_TOKEN_PARSED: KeycloakTokenParsed = {
 export class MockKeycloak {
 	static lastConfig?: KeycloakConfig = undefined;
 	static lastInit?: KeycloakInitOptions = undefined;
-	static authSuccess = false;
+	private static authShouldSucceed = false;
+	private static tokenParsed?: KeycloakTokenParsed;
+
+	static setAuthResult(
+		authShouldSucceed: boolean,
+		tokenParsed?: KeycloakTokenParsed
+	) {
+		if (authShouldSucceed && !tokenParsed) {
+			throw new Error(
+				'Must specify the tokenParsed argument if authorization should succeed'
+			);
+		}
+		MockKeycloak.authShouldSucceed = authShouldSucceed;
+		MockKeycloak.tokenParsed = tokenParsed;
+	}
 
 	static reset() {
 		MockKeycloak.lastConfig = undefined;
 		MockKeycloak.lastInit = undefined;
-		MockKeycloak.authSuccess = false;
+		MockKeycloak.authShouldSucceed = false;
+		MockKeycloak.tokenParsed = undefined;
 	}
 
 	token?: string;
@@ -29,12 +44,14 @@ export class MockKeycloak {
 
 	init(options: KeycloakInitOptions): Promise<boolean> {
 		MockKeycloak.lastInit = options;
-		if (MockKeycloak.authSuccess) {
+		if (MockKeycloak.authShouldSucceed) {
 			this.token = DEFAULT_TOKEN;
 			this.tokenParsed = DEFAULT_TOKEN_PARSED;
 		}
 
-		return new Promise((resolve) => resolve(MockKeycloak.authSuccess));
+		return new Promise((resolve) =>
+			resolve(MockKeycloak.authShouldSucceed)
+		);
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
