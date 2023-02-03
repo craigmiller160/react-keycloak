@@ -9,6 +9,7 @@ import {
 	TOKEN_PARSED
 } from '../testutils/data';
 import { authorizeWithKeycloak } from '../../src/service/AuthorizeWithKeycloak';
+import { UnauthorizedError } from '../../src/errors/UnauthorizedError';
 
 describe('AuthorizeWithKeycloak', () => {
 	it('handles a successful authentication', async () => {
@@ -27,7 +28,17 @@ describe('AuthorizeWithKeycloak', () => {
 	});
 
 	it('handles a failed authentication', async () => {
-		throw new Error();
+		MockKeycloak.setAuthResult(false);
+		try {
+			await authorizeWithKeycloak({
+				accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
+				realm: REALM,
+				authServerUrl: AUTH_SERVER_URL,
+				clientId: CLIENT_ID
+			});
+		} catch (ex) {
+			expect(ex).toBeInstanceOf(UnauthorizedError);
+		}
 	});
 
 	it('handles a successful authentication, and a successful refresh', async () => {
