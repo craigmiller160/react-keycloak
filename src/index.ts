@@ -1,3 +1,6 @@
-export { KeycloakAuthContext } from './KeycloakAuthContext';
-export type { KeycloakAuth, KeycloakAuthStatus } from './KeycloakAuthContext';
-export { KeycloakAuthProvider } from './KeycloakAuthProvider';
+export { KeycloakAuthContext } from './react/KeycloakAuthContext';
+export type {
+	KeycloakAuth,
+	KeycloakAuthStatus
+} from './react/KeycloakAuthContext';
+export { KeycloakAuthProvider } from './react/KeycloakAuthProvider';

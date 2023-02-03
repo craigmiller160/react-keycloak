@@ -1,10 +1,10 @@
 import { describe, it, vi, expect, beforeEach } from 'vitest';
 import { render, waitFor, screen } from '@testing-library/react';
-import { KeycloakAuthContext, KeycloakAuthProvider } from '../src';
-import { DEFAULT_TOKEN, MockKeycloak } from './mocks/MockKeycloak';
+import { KeycloakAuthContext, KeycloakAuthProvider } from '../../src';
+import { DEFAULT_TOKEN, MockKeycloak } from '../mocks/MockKeycloak';
 import { useContext } from 'react';
 import { KeycloakTokenParsed } from 'keycloak-js';
-import { RequiredRoles } from '../src/KeycloakAuthProvider';
+import { RequiredRoles } from '../../src/react/KeycloakAuthProvider';
 
 vi.mock('keycloak-js', async () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
