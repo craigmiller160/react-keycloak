@@ -47,7 +47,10 @@ const handleRoleCheck = (context: AuthContext): Promise<AuthContext> => {
 	) {
 		return Promise.reject(new AccessDeniedError());
 	}
-	return Promise.resolve(context);
+	return Promise.resolve({
+		...context,
+		state: 'authorized'
+	});
 };
 
 const handleAuthStep = (context: AuthContext): Promise<AuthContext> => {
@@ -57,9 +60,8 @@ const handleAuthStep = (context: AuthContext): Promise<AuthContext> => {
 		case 'role-check':
 			return handleRoleCheck(context).then(handleAuthStep);
 		case 'authorized':
-			return Promise.resolve();
 		default:
-			return Promise.resolve();
+			return Promise.resolve(context);
 	}
 };
 
