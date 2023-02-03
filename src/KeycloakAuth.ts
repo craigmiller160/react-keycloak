@@ -7,5 +7,6 @@ export type LogoutFn = () => void;
 export type KeycloakAuth = {
 	readonly authStatus: KeycloakAuthStatus;
 	readonly logout: LogoutFn;
-	readonly token?: KeycloakTokenParsed;
+	readonly token?: string;
+	readonly tokenParsed?: KeycloakTokenParsed;
 };
