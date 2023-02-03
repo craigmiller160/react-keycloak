@@ -1,8 +1,10 @@
 import { KeycloakAuthConfig } from './KeycloakAuthConfig';
 import Keycloak from 'keycloak-js';
 import { KeycloakAuth, KeycloakAuthStatus } from '../KeycloakAuth';
+import { UnauthorizedError } from '../errors/UnauthorizedError';
+import { AccessDeniedError } from '../errors/AccessDeniedError';
 
-type AuthState = 'authorizing' | 'role-check' | 'authorized' | 'unauthorized';
+type AuthState = 'authorizing' | 'role-check' | 'authorized';
 
 type AuthContext = {
 	readonly state: AuthState;
@@ -18,17 +20,42 @@ const handleAuthorizing = (context: AuthContext): Promise<AuthContext> =>
 				state: 'role-check'
 			});
 		}
-		return Promise.reject(new Error('Authorization'));
+		return Promise.reject(new UnauthorizedError());
 	});
+
+const handleRoleCheck = (context: AuthContext): Promise<AuthContext> => {
+	const missingRequiredRealmRoles = (
+		context.config.requiredRoles?.realm ?? []
+	).filter(
+		(role) =>
+			!context.keycloak.tokenParsed!.realm_access!.roles.includes(role)
+	);
+	const missingRequiredClientRoles = Object.entries(
+		context.config.requiredRoles?.client ?? {}
+	).flatMap(([clientId, roles]) => {
+		roles.filter(
+			(role) =>
+				!context.keycloak.tokenParsed!.resource_access![
+					clientId
+				].roles.includes(role)
+		);
+	});
+
+	if (
+		missingRequiredRealmRoles.length > 0 ||
+		missingRequiredClientRoles.length > 0
+	) {
+		return Promise.reject(new AccessDeniedError());
+	}
+	return Promise.resolve(context);
+};
 
 const handleAuthStep = (context: AuthContext): Promise<AuthContext> => {
 	switch (context.state) {
 		case 'authorizing':
 			return handleAuthorizing(context).then(handleAuthStep);
 		case 'role-check':
-			return Promise.resolve();
-		case 'unauthorized':
-			return Promise.resolve();
+			return handleRoleCheck(context).then(handleAuthStep);
 		case 'authorized':
 			return Promise.resolve();
 		default:
