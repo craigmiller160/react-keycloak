@@ -12,18 +12,13 @@ type AuthContext = {
 
 const handleAuthorizing = (context: AuthContext): Promise<AuthContext> =>
 	context.keycloak.init({ onLoad: 'login-required' }).then((isSuccess) => {
-		switch (isSuccess) {
-			case true:
-				return {
-					...context,
-					state: 'unauthorized'
-				};
-			default:
-				return {
-					...context,
-					state: 'unauthorized'
-				};
+		if (isSuccess) {
+			return Promise.resolve({
+				...context,
+				state: 'role-check'
+			});
 		}
+		return Promise.reject(new Error('Authorization'));
 	});
 
 const handleAuthStep = (context: AuthContext): Promise<AuthContext> => {
