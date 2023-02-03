@@ -3,6 +3,7 @@ import { render, waitFor, screen } from '@testing-library/react';
 import { KeycloakAuthContext, KeycloakAuthProvider } from '../src';
 import { DEFAULT_TOKEN, MockKeycloak } from './mocks/MockKeycloak';
 import { useContext } from 'react';
+import { KeycloakTokenParsed } from 'keycloak-js';
 
 vi.mock('keycloak-js', async () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -17,6 +18,23 @@ const AUTH_SERVER_URL = 'https://auth-server.com';
 const ACCESS_TOKEN_EXP = 3000000;
 const REALM = 'realm';
 const LOCAL_STORAGE_KEY = 'local-storage-key';
+const REALM_ACCESS_ROLE = 'realm-access';
+const CLIENT_ACCESS_ROLE = 'client-access';
+
+const tokenParsed: KeycloakTokenParsed = {
+	sub: 'mock-token'
+};
+const tokenParsedWithRoles: KeycloakTokenParsed = {
+	...tokenParsed,
+	realm_access: {
+		roles: [REALM_ACCESS_ROLE]
+	},
+	resource_access: {
+		[CLIENT_ID]: {
+			roles: [CLIENT_ACCESS_ROLE]
+		}
+	}
+};
 
 const KeycloakRenderer = () => {
 	const { isAuthorized, authStatus } = useContext(KeycloakAuthContext);
@@ -48,7 +66,7 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a successful authentication', async () => {
-		MockKeycloak.setAuthResult(true, { sub: 'mock-token' });
+		MockKeycloak.setAuthResult(true, tokenParsed);
 		doRender();
 		await waitFor(() =>
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
