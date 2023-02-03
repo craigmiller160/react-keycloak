@@ -30,6 +30,14 @@ describe('AuthorizeWithKeycloak', () => {
 		throw new Error();
 	});
 
+	it('handles a successful authentication, and a successful refresh', async () => {
+		throw new Error();
+	});
+
+	it('handles a successful authentication, and a failed refresh', async () => {
+		throw new Error();
+	});
+
 	it('handles a successful authentication with the required realm roles', async () => {
 		throw new Error();
 	});
