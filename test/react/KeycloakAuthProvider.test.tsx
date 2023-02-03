@@ -6,14 +6,6 @@ import { useContext } from 'react';
 import { KeycloakTokenParsed } from 'keycloak-js';
 import { RequiredRoles } from '../../src/react/KeycloakAuthProvider';
 
-vi.mock('keycloak-js', async () => {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const mock = (await vi.importActual('./mocks/MockKeycloak')) as any;
-	return {
-		default: mock.MockKeycloak
-	};
-});
-
 const CLIENT_ID = 'test-client';
 const AUTH_SERVER_URL = 'https://auth-server.com';
 const ACCESS_TOKEN_EXP = 3000000;
@@ -60,7 +52,6 @@ const doRender = (requiredRoles?: Partial<RequiredRoles>) =>
 
 describe('KeycloakAuthProvider', () => {
 	beforeEach(() => {
-		MockKeycloak.reset();
 		localStorage.clear();
 	});
 
