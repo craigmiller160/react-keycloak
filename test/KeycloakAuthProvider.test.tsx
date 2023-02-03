@@ -87,11 +87,15 @@ describe('KeycloakAuthProvider', () => {
 		);
 	});
 
-	it('handles a successful authentication with the required roles', () => {
+	it('handles a successful authentication with the required realm roles', () => {
 		throw new Error();
 	});
 
-	it('handles a successful authentication without the required roles', () => {
+	it('handles a successful authentication with the required client roles', () => {
+		throw new Error();
+	});
+
+	it('handles a successful authentication without the roles required roles', () => {
 		throw new Error();
 	});
 });
