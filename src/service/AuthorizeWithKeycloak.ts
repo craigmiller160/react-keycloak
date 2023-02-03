@@ -4,7 +4,11 @@ import { KeycloakAuth } from '../KeycloakAuth';
 import { UnauthorizedError } from '../errors/UnauthorizedError';
 import { AccessDeniedError } from '../errors/AccessDeniedError';
 
-type AuthState = 'authorizing' | 'role-check' | 'authorized';
+type AuthState =
+	| 'authorizing'
+	| 'role-check'
+	| 'prepare-refresh'
+	| 'authorized';
 
 type AuthContext = {
 	readonly state: AuthState;
@@ -52,6 +56,8 @@ const handleRoleCheck = (context: AuthContext): Promise<AuthContext> => {
 		state: 'authorized'
 	});
 };
+
+const handlePrepareRefresh
 
 const handleAuthStep = (context: AuthContext): Promise<AuthContext> => {
 	switch (context.state) {

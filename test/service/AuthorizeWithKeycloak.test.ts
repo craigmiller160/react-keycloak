@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import {afterEach, beforeEach, describe, expect, it} from 'vitest';
 import { MockKeycloak } from '../mocks/MockKeycloak';
 import {
 	ACCESS_TOKEN_EXP,
@@ -13,11 +13,20 @@ import {
 import { authorizeWithKeycloak } from '../../src/service/AuthorizeWithKeycloak';
 import { UnauthorizedError } from '../../src/errors/UnauthorizedError';
 import { AccessDeniedError } from '../../src/errors/AccessDeniedError';
+import { KeycloakAuth } from '../../src/KeycloakAuth';
 
 describe('AuthorizeWithKeycloak', () => {
+	let result: KeycloakAuth | undefined = undefined;
+
+	afterEach(() => {
+		if (result) {
+			result.stopRefresh();
+		}
+	});
+
 	it('handles a successful authentication', async () => {
 		MockKeycloak.setAuthResult(true);
-		const result = await authorizeWithKeycloak({
+		result = await authorizeWithKeycloak({
 			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
 			realm: REALM,
 			authServerUrl: AUTH_SERVER_URL,
@@ -55,7 +64,7 @@ describe('AuthorizeWithKeycloak', () => {
 
 	it('handles a successful authentication with the required realm roles', async () => {
 		MockKeycloak.setAuthResult(true);
-		const result = await authorizeWithKeycloak({
+		result = await authorizeWithKeycloak({
 			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
 			realm: REALM,
 			authServerUrl: AUTH_SERVER_URL,
@@ -74,7 +83,7 @@ describe('AuthorizeWithKeycloak', () => {
 
 	it('handles a successful authentication with the required client roles', async () => {
 		MockKeycloak.setAuthResult(true);
-		const result = await authorizeWithKeycloak({
+		result = await authorizeWithKeycloak({
 			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
 			realm: REALM,
 			authServerUrl: AUTH_SERVER_URL,
