@@ -106,14 +106,17 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a successful authentication with the required realm roles', () => {
+		MockKeycloak.setAuthResult(true, tokenParsedWithRoles);
 		throw new Error();
 	});
 
 	it('handles a successful authentication with the required client roles', () => {
+		MockKeycloak.setAuthResult(true, tokenParsedWithRoles);
 		throw new Error();
 	});
 
 	it('handles a successful authentication without the roles required roles', () => {
+		MockKeycloak.setAuthResult(true, tokenParsedWithRoles);
 		throw new Error();
 	});
 });
