@@ -58,4 +58,7 @@ export class MockKeycloak {
 	updateToken(minValidity: number): Promise<boolean> {
 		return new Promise((resolve) => resolve(true));
 	}
+
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	logout() {}
 }

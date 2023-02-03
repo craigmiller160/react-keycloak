@@ -64,6 +64,7 @@ const handleAuthStep = (context: AuthContext): Promise<AuthContext> => {
 	}
 };
 
+// TODO missing refresh
 export const authorizeWithKeycloak = (
 	config: KeycloakAuthConfig
 ): Promise<KeycloakAuth> => {
