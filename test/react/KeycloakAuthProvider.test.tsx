@@ -1,30 +1,19 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { render, waitFor, screen } from '@testing-library/react';
 import { KeycloakAuthContext, KeycloakAuthProvider } from '../../src';
 import { DEFAULT_TOKEN, MockKeycloak } from '../mocks/MockKeycloak';
 import { useContext } from 'react';
-import { KeycloakTokenParsed } from 'keycloak-js';
 import { RequiredRoles } from '../../src/react/KeycloakAuthProvider';
-
-const CLIENT_ID = 'test-client';
-const AUTH_SERVER_URL = 'https://auth-server.com';
-const ACCESS_TOKEN_EXP = 3000000;
-const REALM = 'realm';
-const LOCAL_STORAGE_KEY = 'local-storage-key';
-const REALM_ACCESS_ROLE = 'realm-access';
-const CLIENT_ACCESS_ROLE = 'client-access';
-
-const tokenParsed: KeycloakTokenParsed = {
-	sub: 'mock-token',
-	realm_access: {
-		roles: [REALM_ACCESS_ROLE]
-	},
-	resource_access: {
-		[CLIENT_ID]: {
-			roles: [CLIENT_ACCESS_ROLE]
-		}
-	}
-};
+import {
+	ACCESS_TOKEN_EXP,
+	AUTH_SERVER_URL,
+	CLIENT_ACCESS_ROLE,
+	CLIENT_ID,
+	LOCAL_STORAGE_KEY,
+	REALM,
+	REALM_ACCESS_ROLE,
+	TOKEN_PARSED
+} from '../testutils/data';
 
 const KeycloakRenderer = () => {
 	const { isAuthorized, authStatus } = useContext(KeycloakAuthContext);
@@ -56,7 +45,7 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a successful authentication', async () => {
-		MockKeycloak.setAuthResult(true, tokenParsed);
+		MockKeycloak.setAuthResult(true, TOKEN_PARSED);
 		doRender();
 		await waitFor(() =>
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
@@ -96,7 +85,7 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a successful authentication with the required realm roles', async () => {
-		MockKeycloak.setAuthResult(true, tokenParsed);
+		MockKeycloak.setAuthResult(true, TOKEN_PARSED);
 		doRender({
 			realm: [REALM_ACCESS_ROLE]
 		});
@@ -116,7 +105,7 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a successful authentication with the required client roles', async () => {
-		MockKeycloak.setAuthResult(true, tokenParsed);
+		MockKeycloak.setAuthResult(true, TOKEN_PARSED);
 		doRender({
 			client: {
 				[CLIENT_ID]: [CLIENT_ACCESS_ROLE]
@@ -138,7 +127,7 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a successful authentication without the roles required roles', async () => {
-		MockKeycloak.setAuthResult(true, tokenParsed);
+		MockKeycloak.setAuthResult(true, TOKEN_PARSED);
 		doRender({
 			realm: ['not_there']
 		});
