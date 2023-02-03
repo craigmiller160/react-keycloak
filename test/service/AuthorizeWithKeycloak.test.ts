@@ -25,6 +25,7 @@ describe('AuthorizeWithKeycloak', () => {
 		});
 		expect(result).toEqual({
 			logout: expect.any(Function),
+			stopRefresh: expect.any(Function),
 			token: TOKEN,
 			tokenParsed: TOKEN_PARSED
 		});
@@ -65,6 +66,7 @@ describe('AuthorizeWithKeycloak', () => {
 		});
 		expect(result).toEqual({
 			logout: expect.any(Function),
+			stopRefresh: expect.any(Function),
 			token: TOKEN,
 			tokenParsed: TOKEN_PARSED
 		});
@@ -83,6 +85,7 @@ describe('AuthorizeWithKeycloak', () => {
 		});
 		expect(result).toEqual({
 			logout: expect.any(Function),
+			stopRefresh: expect.any(Function),
 			token: TOKEN,
 			tokenParsed: TOKEN_PARSED
 		});

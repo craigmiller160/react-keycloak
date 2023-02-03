@@ -10,6 +10,7 @@ type AuthContext = {
 	readonly state: AuthState;
 	readonly config: KeycloakAuthConfig;
 	readonly keycloak: Keycloak;
+	readonly refreshInterval: number;
 };
 
 const handleAuthorizing = (context: AuthContext): Promise<AuthContext> =>
@@ -76,10 +77,12 @@ export const authorizeWithKeycloak = (
 	return handleAuthStep({
 		state: 'authorizing',
 		config,
-		keycloak
+		keycloak,
+		refreshInterval: 0
 	}).then(
-		(): KeycloakAuth => ({
+		(context): KeycloakAuth => ({
 			logout: keycloak.logout,
+			stopRefresh: () => window.clearInterval(context.refreshInterval),
 			token: keycloak.token,
 			tokenParsed: keycloak.tokenParsed
 		})
