@@ -1,8 +1,8 @@
 import { KeycloakAuthConfig } from './KeycloakAuthConfig';
 import Keycloak from 'keycloak-js';
-import { KeycloakAuth } from '../KeycloakAuth';
+import { KeycloakAuth, KeycloakAuthStatus } from '../KeycloakAuth';
 
-type AuthState = 'pre-auth' | 'authorizing' | 'role-check' | 'post-auth';
+type AuthState = 'authorizing' | 'role-check' | 'authorized' | 'unauthorized';
 
 type AuthContext = {
 	readonly state: AuthState;
@@ -10,7 +10,36 @@ type AuthContext = {
 	readonly keycloak: Keycloak;
 };
 
-const handleAuthStep = (context: AuthContext): Promise<unknown> => {};
+const handleAuthorizing = (context: AuthContext): Promise<AuthContext> =>
+	context.keycloak.init({ onLoad: 'login-required' }).then((isSuccess) => {
+		switch (isSuccess) {
+			case true:
+				return {
+					...context,
+					state: 'unauthorized'
+				};
+			default:
+				return {
+					...context,
+					state: 'unauthorized'
+				};
+		}
+	});
+
+const handleAuthStep = (context: AuthContext): Promise<AuthContext> => {
+	switch (context.state) {
+		case 'authorizing':
+			return handleAuthorizing(context).then(handleAuthStep);
+		case 'role-check':
+			return Promise.resolve();
+		case 'unauthorized':
+			return Promise.resolve();
+		case 'authorized':
+			return Promise.resolve();
+		default:
+			return Promise.resolve();
+	}
+};
 
 export const authorizeWithKeycloak = (
 	config: KeycloakAuthConfig
