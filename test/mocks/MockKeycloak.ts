@@ -3,30 +3,15 @@ import type {
 	KeycloakInitOptions,
 	KeycloakTokenParsed
 } from 'keycloak-js';
-
-export const DEFAULT_TOKEN = 'ABCDEFG';
-
-const DEFAULT_TOKEN_PARSED: KeycloakTokenParsed = {
-	sub: 'mock-token'
-};
+import { TOKEN, TOKEN_PARSED } from '../testutils/data';
 
 export class MockKeycloak {
 	static lastConfig?: KeycloakConfig = undefined;
 	static lastInit?: KeycloakInitOptions = undefined;
 	private static authShouldSucceed = false;
-	private static tokenParsed?: KeycloakTokenParsed;
 
-	static setAuthResult(
-		authShouldSucceed: boolean,
-		tokenParsed?: KeycloakTokenParsed
-	) {
-		if (authShouldSucceed && !tokenParsed) {
-			throw new Error(
-				'Must specify the tokenParsed argument if authorization should succeed'
-			);
-		}
+	static setAuthResult(authShouldSucceed: boolean) {
 		MockKeycloak.authShouldSucceed = authShouldSucceed;
-		MockKeycloak.tokenParsed = tokenParsed;
 	}
 
 	static reset() {
@@ -45,8 +30,8 @@ export class MockKeycloak {
 	init(options: KeycloakInitOptions): Promise<boolean> {
 		MockKeycloak.lastInit = options;
 		if (MockKeycloak.authShouldSucceed) {
-			this.token = DEFAULT_TOKEN;
-			this.tokenParsed = DEFAULT_TOKEN_PARSED;
+			this.token = TOKEN;
+			this.tokenParsed = TOKEN_PARSED;
 		}
 
 		return new Promise((resolve) =>

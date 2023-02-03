@@ -8,6 +8,7 @@ export const LOCAL_STORAGE_KEY = 'local-storage-key';
 export const REALM_ACCESS_ROLE = 'realm-access';
 export const CLIENT_ACCESS_ROLE = 'client-access';
 
+export const TOKEN = 'ABCDEFG';
 export const TOKEN_PARSED: KeycloakTokenParsed = {
 	sub: 'mock-token',
 	realm_access: {

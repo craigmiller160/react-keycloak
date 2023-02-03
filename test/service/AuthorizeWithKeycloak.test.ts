@@ -1,17 +1,18 @@
-import { describe, it, expect } from 'vitest';
-import { DEFAULT_TOKEN, MockKeycloak } from '../mocks/MockKeycloak';
+import { describe, expect, it } from 'vitest';
+import { MockKeycloak } from '../mocks/MockKeycloak';
 import {
 	ACCESS_TOKEN_EXP,
 	AUTH_SERVER_URL,
 	CLIENT_ID,
 	REALM,
+	TOKEN,
 	TOKEN_PARSED
 } from '../testutils/data';
 import { authorizeWithKeycloak } from '../../src/service/AuthorizeWithKeycloak';
 
 describe('AuthorizeWithKeycloak', () => {
 	it('handles a successful authentication', async () => {
-		MockKeycloak.setAuthResult(true, TOKEN_PARSED);
+		MockKeycloak.setAuthResult(true);
 		const result = await authorizeWithKeycloak({
 			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
 			realm: REALM,
@@ -20,7 +21,7 @@ describe('AuthorizeWithKeycloak', () => {
 		});
 		expect(result).toEqual({
 			logout: expect.any(Function),
-			token: DEFAULT_TOKEN,
+			token: TOKEN,
 			tokenParsed: TOKEN_PARSED
 		});
 	});
