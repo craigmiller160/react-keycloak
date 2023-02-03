@@ -89,6 +89,7 @@ describe('AuthorizeWithKeycloak', () => {
 	});
 
 	it('handles a successful authentication without the roles required roles', async () => {
+		MockKeycloak.setAuthResult(true);
 		try {
 			await authorizeWithKeycloak({
 				accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
