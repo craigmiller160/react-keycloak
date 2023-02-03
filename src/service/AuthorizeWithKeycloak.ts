@@ -1,6 +1,6 @@
 import { KeycloakAuthConfig } from './KeycloakAuthConfig';
 import Keycloak from 'keycloak-js';
-import { KeycloakAuth, KeycloakAuthStatus } from '../KeycloakAuth';
+import { KeycloakAuth } from '../KeycloakAuth';
 import { UnauthorizedError } from '../errors/UnauthorizedError';
 import { AccessDeniedError } from '../errors/AccessDeniedError';
 
@@ -28,14 +28,14 @@ const handleRoleCheck = (context: AuthContext): Promise<AuthContext> => {
 		context.config.requiredRoles?.realm ?? []
 	).filter(
 		(role) =>
-			!context.keycloak.tokenParsed!.realm_access!.roles.includes(role)
+			!context.keycloak.tokenParsed?.realm_access?.roles.includes(role)
 	);
 	const missingRequiredClientRoles = Object.entries(
 		context.config.requiredRoles?.client ?? {}
 	).flatMap(([clientId, roles]) => {
 		roles.filter(
 			(role) =>
-				!context.keycloak.tokenParsed!.resource_access![
+				!context.keycloak.tokenParsed?.resource_access?.[
 					clientId
 				].roles.includes(role)
 		);
