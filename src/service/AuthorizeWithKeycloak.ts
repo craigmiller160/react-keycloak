@@ -79,7 +79,6 @@ export const authorizeWithKeycloak = (
 		keycloak
 	}).then(
 		(): KeycloakAuth => ({
-			authStatus: 'authorized',
 			logout: keycloak.logout,
 			token: keycloak.token,
 			tokenParsed: keycloak.tokenParsed
