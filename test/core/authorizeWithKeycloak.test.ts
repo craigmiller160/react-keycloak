@@ -122,7 +122,31 @@ describe('authorizeWithKeycloak', () => {
 		]);
 	});
 
-	it('passes a successful authorization and a failed refresh to the subscription', () => {
+	it('passes a successful authorization and an unauthorized refresh to the subscription', async () => {
+		MockKeycloak.setAuthResults(true, false);
+		authorization = authorizeWithKeycloak({
+			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID
+		});
+		const promise = subscriptionToPromise(2)(authorization.subscribe);
+		jest.advanceTimersByTime((ACCESS_TOKEN_EXP + 10) * 1000);
+		const results = await promise;
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			},
+			{
+				error: expect.objectContaining({
+					type: 'unauthorized'
+				})
+			}
+		]);
+	});
+
+	it('passes a successful authorization and an access denied refresh to the subscription', async () => {
 		throw new Error();
 	});
 
