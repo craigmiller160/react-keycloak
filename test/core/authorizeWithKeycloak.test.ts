@@ -1,4 +1,4 @@
-import { describe, it } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
 	KeycloakAuthorization,
 	KeycloakAuthSubscribe
@@ -8,8 +8,10 @@ import { authorizeWithKeycloak } from '../../src/core/authorizeWithKeycloak';
 import {
 	ACCESS_TOKEN_EXP,
 	AUTH_SERVER_URL,
+	CLIENT_ACCESS_ROLE,
 	CLIENT_ID,
 	REALM,
+	REALM_ACCESS_ROLE,
 	TOKEN,
 	TOKEN_PARSED
 } from '../testutils/data';
@@ -75,8 +77,22 @@ describe('authorizeWithKeycloak', () => {
 		]);
 	});
 
-	it('passes an unauthorized error to the subscription', () => {
-		throw new Error();
+	it('passes an unauthorized error to the subscription', async () => {
+		MockKeycloak.setAuthResult(false);
+		authorization = authorizeWithKeycloak({
+			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID
+		});
+		const results = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(results).toEqual([
+			{
+				error: expect.objectContaining({
+					type: 'unauthorized'
+				})
+			}
+		]);
 	});
 
 	it('passes a successful authorization and a successful refresh to the subscription', () => {
@@ -99,12 +115,44 @@ describe('authorizeWithKeycloak', () => {
 		throw new Error();
 	});
 
-	it('passes a successful authorization with the required realm roles to the subscription', () => {
-		throw new Error();
+	it('passes a successful authorization with the required realm roles to the subscription', async () => {
+		MockKeycloak.setAuthResult(true);
+		authorization = authorizeWithKeycloak({
+			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			requiredRoles: {
+				realm: [REALM_ACCESS_ROLE]
+			}
+		});
+		const results = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			}
+		]);
 	});
 
-	it('passes a successful authorization with the required client roles to the subscription', () => {
-		throw new Error();
+	it('passes a successful authorization with the required client roles to the subscription', async () => {
+		MockKeycloak.setAuthResult(true);
+		authorization = authorizeWithKeycloak({
+			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			requiredRoles: {
+				client: [CLIENT_ACCESS_ROLE]
+			}
+		});
+		const results = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			}
+		]);
 	});
 
 	it('passes an access denied error due to missing required realm role to the subscription', () => {
