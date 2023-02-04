@@ -3,7 +3,7 @@ import { KeycloakAuthConfig } from './service/KeycloakAuthConfig';
 import { KeycloakTokenParsed } from 'keycloak-js';
 
 type KeycloakAuthSubscription = {
-	readonly unsubscribe: () => void;
+	readonly unsubscribe: (stopRefresh?: boolean) => void;
 };
 
 type KeycloakAuthSuccessFn = (
