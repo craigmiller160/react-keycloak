@@ -62,6 +62,9 @@ const subscriptionToPromise =
 			);
 		});
 
+const advancePastRefresh = () =>
+	vi.advanceTimersByTime(ACCESS_TOKEN_EXP * 1000 + 10);
+
 describe('authorizeWithKeycloak', () => {
 	let authorization: KeycloakAuthorization | undefined = undefined;
 	beforeEach(() => {
@@ -118,7 +121,7 @@ describe('authorizeWithKeycloak', () => {
 			clientId: CLIENT_ID
 		});
 		const promise = subscriptionToPromise(2)(authorization.subscribe);
-		jest.advanceTimersByTime((ACCESS_TOKEN_EXP + 10) * 1000);
+		advancePastRefresh();
 		const result = await promise;
 		expect(result.results).toEqual([
 			{
@@ -141,7 +144,7 @@ describe('authorizeWithKeycloak', () => {
 			clientId: CLIENT_ID
 		});
 		const promise = subscriptionToPromise(2)(authorization.subscribe);
-		jest.advanceTimersByTime((ACCESS_TOKEN_EXP + 10) * 1000);
+		advancePastRefresh();
 		const result = await promise;
 		expect(result.results).toEqual([
 			{
@@ -186,6 +189,21 @@ describe('authorizeWithKeycloak', () => {
 				subscriptions: []
 			})
 		);
+
+		// Ensuring refresh is still running
+		const promise2 = subscriptionToPromise(2)(authorization.subscribe);
+		advancePastRefresh();
+		const result2 = await promise2;
+		expect(result2.results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			},
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			}
+		]);
 	});
 
 	it('passes a successful authorization to the subscription, then unsubscribes AND cancels refresh at the same time', () => {
