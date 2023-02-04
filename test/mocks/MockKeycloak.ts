@@ -47,6 +47,14 @@ export class MockKeycloak {
 
 		this.currentAuthResult++;
 
+		if (authSuccess && this.onAuthSuccess) {
+			this.onAuthSuccess();
+		}
+
+		if (!authSuccess && this.onAuthError) {
+			this.onAuthError();
+		}
+
 		return new Promise((resolve) => resolve(authSuccess));
 	}
 
@@ -69,9 +77,26 @@ export class MockKeycloak {
 		}
 
 		this.currentAuthResult++;
+
+		if (authSuccess && this.onAuthRefreshSuccess) {
+			this.onAuthRefreshSuccess();
+		}
+
+		if (!authSuccess && this.onAuthRefreshError) {
+			this.onAuthRefreshError();
+		}
+
 		return new Promise((resolve) => resolve(authSuccess));
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-empty-function
 	logout() {}
+
+	onAuthSuccess?: () => void;
+
+	onAuthError?: () => void;
+
+	onAuthRefreshSuccess?: () => void;
+
+	onAuthRefreshError?: () => void;
 }
