@@ -14,15 +14,17 @@ export type KeycloakAuthConfig = {
 	readonly requiredRoles?: Partial<RequiredRoles>;
 };
 
-export type KeycloakAuthSubscription = {
-	readonly unsubscribe: (stopAuthorization?: boolean) => void;
-};
-
 export type KeycloakAuthSuccessHandler = (
 	token: string,
 	tokenParsed: KeycloakTokenParsed
 ) => void;
 export type KeycloakAuthFailedHandler = (error: KeycloakAuthError) => void;
+export type KeycloakAuthSubscription = {
+	readonly id: string;
+	readonly onSuccess: KeycloakAuthSuccessHandler;
+	readonly onFailure: KeycloakAuthFailedHandler;
+	readonly unsubscribe: (stopAuthorization?: boolean) => void;
+};
 export type KeycloakAuthSubscribe = (
 	onSuccess: KeycloakAuthSuccessHandler,
 	onFailure: KeycloakAuthFailedHandler
