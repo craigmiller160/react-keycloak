@@ -1,38 +1,25 @@
-// TODO delete this whole file
-import { KeycloakAuthConfig } from './service/KeycloakAuthConfig';
+import { RequiredRoles } from './core/types';
 import { KeycloakTokenParsed } from 'keycloak-js';
+import { KeycloakAuthError } from './errors/KeycloakAuthError';
 
-type KeycloakAuthSubscription = {
-	readonly unsubscribe: (stopRefresh?: boolean) => void;
+type KeycloakAuthConfig = {
+	readonly realm: string;
+	readonly authServerUrl: string;
+	readonly clientId: string;
+	readonly requiredRoles?: Partial<RequiredRoles>;
 };
 
-type KeycloakAuthSuccessFn = (
+export type KeycloakAuthSuccessHandler = (
 	token: string,
 	tokenParsed: KeycloakTokenParsed
 ) => void;
-type KeycloakAuthFailedFn = (error: Error) => void;
+export type KeycloakAuthFailedHandler = (error: KeycloakAuthError) => void;
 
-type KeycloakAuthorization = {
-	readonly subscribe: (
-		onSuccess: KeycloakAuthSuccessFn,
-		onFailure: KeycloakAuthFailedFn
-	) => KeycloakAuthSubscription;
-	readonly stopRefresh: () => void;
-	readonly logout: () => void;
-};
+type AuthorizeWithKeycloak = (
+	onSuccess: KeycloakAuthSuccessHandler,
+	onFailure: KeycloakAuthFailedHandler
+) => void;
 
-const authorizeWithKeycloak = (
+type CreateKeycloakAuthorization = (
 	config: KeycloakAuthConfig
-): KeycloakAuthorization => {};
-
-const authorization = authorizeWithKeycloak({
-	clientId: '',
-	authServerUrl: '',
-	accessTokenExpirationSecs: 0,
-	realm: ''
-});
-
-const subscription = authorization.subscribe(
-	() => null,
-	() => null
-);
+) => AuthorizeWithKeycloak;
