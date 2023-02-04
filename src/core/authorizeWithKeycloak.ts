@@ -16,7 +16,7 @@ const handleAuthorizing = (context: AuthContext): Promise<AuthContext> =>
 		if (isSuccess) {
 			return Promise.resolve({
 				...context,
-				state: 'role-check'
+				state: 'authorized'
 			});
 		}
 		return Promise.reject(new UnauthorizedError());
@@ -38,7 +38,7 @@ export const authorizeWithKeycloak: AuthorizeWithKeycloak = (config) => {
 		realm: config.realm,
 		clientId: config.clientId
 	});
-	handleAuthStep({
+	const promise = handleAuthStep({
 		config,
 		keycloak,
 		state: 'authorizing'
