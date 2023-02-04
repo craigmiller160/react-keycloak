@@ -176,11 +176,41 @@ describe('authorization', () => {
 	});
 
 	it('handles a failed authorization because missing a required realm role', async () => {
-		throw new Error();
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		const authorize = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			requiredRoles: {
+				realm: ['abc']
+			}
+		});
+		const results = await promisify(1)(authorize);
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			}
+		]);
 	});
 
 	it('handles a failed authorization because missing a required client role', async () => {
-		throw new Error();
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		const authorize = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			requiredRoles: {
+				client: ['abc']
+			}
+		});
+		const results = await promisify(1)(authorize);
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			}
+		]);
 	});
 
 	it('handles a successful authorization but a failed refresh because realm role removed', async () => {
