@@ -2,7 +2,7 @@ import { KeycloakTokenParsed } from 'keycloak-js';
 
 export const CLIENT_ID = 'test-client';
 export const AUTH_SERVER_URL = 'https://auth-server.com';
-export const ACCESS_TOKEN_EXP = 3000000;
+export const ACCESS_TOKEN_EXP = 30;
 export const REALM = 'realm';
 export const LOCAL_STORAGE_KEY = 'local-storage-key';
 export const REALM_ACCESS_ROLE = 'realm-access';

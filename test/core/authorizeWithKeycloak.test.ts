@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest';
 import {
 	KeycloakAuthorization,
 	KeycloakAuthSubscribe
@@ -54,10 +54,14 @@ const subscriptionToPromise =
 
 describe('authorizeWithKeycloak', () => {
 	let authorization: KeycloakAuthorization | undefined = undefined;
+	beforeEach(() => {
+		vi.useFakeTimers();
+	});
 	afterEach(() => {
 		if (authorization) {
 			authorization.stopRefreshAndSubscriptions();
 		}
+		vi.useRealTimers();
 	});
 
 	it('passes a successful authorization to the subscription', async () => {
@@ -95,8 +99,27 @@ describe('authorizeWithKeycloak', () => {
 		]);
 	});
 
-	it('passes a successful authorization and a successful refresh to the subscription', () => {
-		throw new Error();
+	it('passes a successful authorization and a successful refresh to the subscription', async () => {
+		MockKeycloak.setAuthResult(true);
+		authorization = authorizeWithKeycloak({
+			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID
+		});
+		const promise = subscriptionToPromise(2)(authorization.subscribe);
+		jest.advanceTimersByTime((ACCESS_TOKEN_EXP + 10) * 1000);
+		const results = await promise;
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			},
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			}
+		]);
 	});
 
 	it('passes a successful authorization and a failed refresh to the subscription', () => {
