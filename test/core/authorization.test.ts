@@ -1,6 +1,18 @@
-import { describe, it, vi } from 'vitest';
+import { beforeEach, describe, it, vi } from 'vitest';
+import { ACCESS_TOKEN_EXP } from '../testutils/data';
+
+const advancePastRefresh = () =>
+	vi.advanceTimersByTime(ACCESS_TOKEN_EXP * 1000 + 10);
 
 describe('authorization', () => {
+	beforeEach(() => {
+		vi.useFakeTimers();
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
 	it('handles a successful authorization', async () => {
 		throw new Error();
 	});
