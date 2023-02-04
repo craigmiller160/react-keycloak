@@ -45,7 +45,7 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a successful authentication', async () => {
-		MockKeycloak.setAuthResult(true, TOKEN_PARSED);
+		MockKeycloak.setAuthResults(true, TOKEN_PARSED);
 		doRender();
 		await waitFor(() =>
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
@@ -63,7 +63,7 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a failed authentication', async () => {
-		MockKeycloak.setAuthResult(false);
+		MockKeycloak.setAuthResults(false);
 		doRender();
 		await waitFor(() =>
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
@@ -85,7 +85,7 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a successful authentication with the required realm roles', async () => {
-		MockKeycloak.setAuthResult(true, TOKEN_PARSED);
+		MockKeycloak.setAuthResults(true, TOKEN_PARSED);
 		doRender({
 			realm: [REALM_ACCESS_ROLE]
 		});
@@ -105,7 +105,7 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a successful authentication with the required client roles', async () => {
-		MockKeycloak.setAuthResult(true, TOKEN_PARSED);
+		MockKeycloak.setAuthResults(true, TOKEN_PARSED);
 		doRender({
 			client: {
 				[CLIENT_ID]: [CLIENT_ACCESS_ROLE]
@@ -127,7 +127,7 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a successful authentication without the roles required roles', async () => {
-		MockKeycloak.setAuthResult(true, TOKEN_PARSED);
+		MockKeycloak.setAuthResults(true, TOKEN_PARSED);
 		doRender({
 			realm: ['not_there']
 		});

@@ -25,7 +25,7 @@ describe('AuthorizeWithKeycloak', () => {
 	});
 
 	it('handles a successful authentication', async () => {
-		MockKeycloak.setAuthResult(true);
+		MockKeycloak.setAuthResults(true);
 		result = await authorizeWithKeycloak({
 			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
 			realm: REALM,
@@ -41,7 +41,7 @@ describe('AuthorizeWithKeycloak', () => {
 	});
 
 	it('handles a failed authentication', async () => {
-		MockKeycloak.setAuthResult(false);
+		MockKeycloak.setAuthResults(false);
 		try {
 			await authorizeWithKeycloak({
 				accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
@@ -63,7 +63,7 @@ describe('AuthorizeWithKeycloak', () => {
 	});
 
 	it('handles a successful authentication with the required realm roles', async () => {
-		MockKeycloak.setAuthResult(true);
+		MockKeycloak.setAuthResults(true);
 		result = await authorizeWithKeycloak({
 			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
 			realm: REALM,
@@ -82,7 +82,7 @@ describe('AuthorizeWithKeycloak', () => {
 	});
 
 	it('handles a successful authentication with the required client roles', async () => {
-		MockKeycloak.setAuthResult(true);
+		MockKeycloak.setAuthResults(true);
 		result = await authorizeWithKeycloak({
 			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
 			realm: REALM,
@@ -101,7 +101,7 @@ describe('AuthorizeWithKeycloak', () => {
 	});
 
 	it('handles a successful authentication without the roles required roles', async () => {
-		MockKeycloak.setAuthResult(true);
+		MockKeycloak.setAuthResults(true);
 		try {
 			await authorizeWithKeycloak({
 				accessTokenExpirationSecs: ACCESS_TOKEN_EXP,

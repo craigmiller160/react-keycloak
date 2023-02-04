@@ -65,7 +65,7 @@ describe('authorizeWithKeycloak', () => {
 	});
 
 	it('passes a successful authorization to the subscription', async () => {
-		MockKeycloak.setAuthResult(true);
+		MockKeycloak.setAuthResults(true);
 		authorization = authorizeWithKeycloak({
 			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
 			realm: REALM,
@@ -82,7 +82,7 @@ describe('authorizeWithKeycloak', () => {
 	});
 
 	it('passes an unauthorized error to the subscription', async () => {
-		MockKeycloak.setAuthResult(false);
+		MockKeycloak.setAuthResults(false);
 		authorization = authorizeWithKeycloak({
 			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
 			realm: REALM,
@@ -100,7 +100,7 @@ describe('authorizeWithKeycloak', () => {
 	});
 
 	it('passes a successful authorization and a successful refresh to the subscription', async () => {
-		MockKeycloak.setAuthResult(true);
+		MockKeycloak.setAuthResults(true, true);
 		authorization = authorizeWithKeycloak({
 			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
 			realm: REALM,
@@ -139,7 +139,7 @@ describe('authorizeWithKeycloak', () => {
 	});
 
 	it('passes a successful authorization with the required realm roles to the subscription', async () => {
-		MockKeycloak.setAuthResult(true);
+		MockKeycloak.setAuthResults(true);
 		authorization = authorizeWithKeycloak({
 			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
 			realm: REALM,
@@ -159,7 +159,7 @@ describe('authorizeWithKeycloak', () => {
 	});
 
 	it('passes a successful authorization with the required client roles to the subscription', async () => {
-		MockKeycloak.setAuthResult(true);
+		MockKeycloak.setAuthResults(true);
 		authorization = authorizeWithKeycloak({
 			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
 			realm: REALM,
@@ -179,7 +179,7 @@ describe('authorizeWithKeycloak', () => {
 	});
 
 	it('passes an access denied error due to missing required realm role to the subscription', async () => {
-		MockKeycloak.setAuthResult(true);
+		MockKeycloak.setAuthResults(true);
 		authorization = authorizeWithKeycloak({
 			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
 			realm: REALM,
@@ -200,7 +200,7 @@ describe('authorizeWithKeycloak', () => {
 	});
 
 	it('passes an access denied error due to missing required client role to the subscription', async () => {
-		MockKeycloak.setAuthResult(true);
+		MockKeycloak.setAuthResults(true);
 		authorization = authorizeWithKeycloak({
 			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
 			realm: REALM,
