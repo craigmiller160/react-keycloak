@@ -29,8 +29,10 @@ export type KeycloakAuthorization = {
 		onSuccess: KeycloakAuthSuccessHandler,
 		onFailure: KeycloakAuthFailedHandler
 	) => KeycloakAuthSubscription;
-	readonly stopRefresh: () => void;
+	readonly stopRefreshAndSubscriptions: () => void;
 	readonly logout: () => void;
 };
 
-// export type AuthorizeWithKeycloak
+export type AuthorizeWithKeycloak = (
+	config: KeycloakAuthConfig
+) => KeycloakAuthorization;

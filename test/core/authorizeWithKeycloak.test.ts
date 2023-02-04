@@ -1,7 +1,30 @@
 import { describe, it } from 'vitest';
+import { KeycloakAuthorization } from '../../src/core/types';
+import { MockKeycloak } from '../mocks/MockKeycloak';
+import { authorizeWithKeycloak } from '../../src/core/authorizeWithKeycloak';
+import {
+	ACCESS_TOKEN_EXP,
+	AUTH_SERVER_URL,
+	CLIENT_ID,
+	REALM
+} from '../testutils/data';
 
 describe('authorizeWithKeycloak', () => {
+	let authorization: KeycloakAuthorization | undefined = undefined;
+	afterEach(() => {
+		if (authorization) {
+			authorization.stopRefreshAndSubscriptions();
+		}
+	});
+
 	it('passes a successful authorization to the subscription', () => {
+		MockKeycloak.setAuthResult(true);
+		authorization = authorizeWithKeycloak({
+			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID
+		});
 		throw new Error();
 	});
 
@@ -25,7 +48,7 @@ describe('authorizeWithKeycloak', () => {
 		throw new Error();
 	});
 
-	it('cancels refresh from authorization', () => {
+	it('cancels refresh and all subscriptions from authorization', () => {
 		throw new Error();
 	});
 
