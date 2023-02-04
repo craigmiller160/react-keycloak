@@ -94,6 +94,10 @@ describe('authorizeWithKeycloak', () => {
 		]);
 	});
 
+	it('has an error during authorization', async () => {
+		throw new Error();
+	});
+
 	it('passes an unauthorized error to the subscription', async () => {
 		MockKeycloak.setAuthResults(null);
 		authorization = authorizeWithKeycloak({
