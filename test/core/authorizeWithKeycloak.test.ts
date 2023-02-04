@@ -19,31 +19,33 @@ import {
 import { KeycloakAuthError } from '../../src/errors/KeycloakAuthError';
 import { KeycloakTokenParsed } from 'keycloak-js';
 
-type SubscriptionHolder = {
-	readonly subscriptions: KeycloakAuthSubscription[];
-};
-
-type SubscriptionResult = {
+type AuthResult = {
 	readonly token: string;
 	readonly tokenParsed: KeycloakTokenParsed;
 	readonly error: KeycloakAuthError;
 };
 
+type SubscriptionResult = {
+	readonly subscription: KeycloakAuthSubscription;
+	readonly results: ReadonlyArray<Partial<AuthResult>>;
+};
+
 const subscriptionToPromise =
 	(waitForResultCount: number) =>
-	(
-		subscribe: KeycloakAuthSubscribe
-	): Promise<Partial<SubscriptionResult>[]> =>
+	(subscribe: KeycloakAuthSubscribe): Promise<SubscriptionResult> =>
 		new Promise((resolve) => {
-			const results: Partial<SubscriptionResult>[] = [];
-			subscribe(
+			const results: Partial<AuthResult>[] = [];
+			const subscription = subscribe(
 				(token, tokenParsed) => {
 					results.push({
 						token,
 						tokenParsed
 					});
 					if (results.length >= waitForResultCount) {
-						resolve(results);
+						resolve({
+							subscription,
+							results
+						});
 					}
 				},
 				(error) => {
@@ -51,7 +53,10 @@ const subscriptionToPromise =
 						error
 					});
 					if (results.length >= waitForResultCount) {
-						resolve(results);
+						resolve({
+							subscription,
+							results
+						});
 					}
 				}
 			);
@@ -77,8 +82,8 @@ describe('authorizeWithKeycloak', () => {
 			authServerUrl: AUTH_SERVER_URL,
 			clientId: CLIENT_ID
 		});
-		const results = await subscriptionToPromise(1)(authorization.subscribe);
-		expect(results).toEqual([
+		const result = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(result.results).toEqual([
 			{
 				token: TOKEN,
 				tokenParsed: TOKEN_PARSED
@@ -94,8 +99,8 @@ describe('authorizeWithKeycloak', () => {
 			authServerUrl: AUTH_SERVER_URL,
 			clientId: CLIENT_ID
 		});
-		const results = await subscriptionToPromise(1)(authorization.subscribe);
-		expect(results).toEqual([
+		const result = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(result.results).toEqual([
 			{
 				error: expect.objectContaining({
 					type: 'unauthorized'
@@ -114,8 +119,8 @@ describe('authorizeWithKeycloak', () => {
 		});
 		const promise = subscriptionToPromise(2)(authorization.subscribe);
 		jest.advanceTimersByTime((ACCESS_TOKEN_EXP + 10) * 1000);
-		const results = await promise;
-		expect(results).toEqual([
+		const result = await promise;
+		expect(result.results).toEqual([
 			{
 				token: TOKEN,
 				tokenParsed: TOKEN_PARSED
@@ -137,8 +142,8 @@ describe('authorizeWithKeycloak', () => {
 		});
 		const promise = subscriptionToPromise(2)(authorization.subscribe);
 		jest.advanceTimersByTime((ACCESS_TOKEN_EXP + 10) * 1000);
-		const results = await promise;
-		expect(results).toEqual([
+		const result = await promise;
+		expect(result.results).toEqual([
 			{
 				token: TOKEN,
 				tokenParsed: TOKEN_PARSED
@@ -155,8 +160,32 @@ describe('authorizeWithKeycloak', () => {
 		throw new Error();
 	});
 
-	it('passes a successful authorization to the subscription, then unsubscribes from authorization updates', () => {
-		throw new Error();
+	it('passes a successful authorization to the subscription, then unsubscribes from authorization updates', async () => {
+		MockKeycloak.setAuthResults(true, true);
+		authorization = authorizeWithKeycloak({
+			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID
+		});
+		const result = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(result.results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			}
+		]);
+		expect(authorization).toEqual(
+			expect.objectContaining({
+				subscriptions: [result.subscription]
+			})
+		);
+		result.subscription.unsubscribe();
+		expect(authorization).toEqual(
+			expect.objectContaining({
+				subscriptions: []
+			})
+		);
 	});
 
 	it('passes a successful authorization to the subscription, then unsubscribes AND cancels refresh at the same time', () => {
