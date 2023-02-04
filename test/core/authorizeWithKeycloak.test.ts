@@ -160,7 +160,37 @@ describe('authorizeWithKeycloak', () => {
 	});
 
 	it('passes a successful authorization and an access denied refresh to the subscription', async () => {
-		throw new Error();
+		const differentRealmRoleToken: KeycloakTokenParsed = {
+			...TOKEN_PARSED,
+			realm_access: {
+				roles: ['abc']
+			}
+		};
+		MockKeycloak.setAuthResults(TOKEN_PARSED, differentRealmRoleToken);
+		authorization = authorizeWithKeycloak({
+			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			requiredRoles: {
+				realm: [REALM_ACCESS_ROLE]
+			}
+		});
+
+		const promise = subscriptionToPromise(2)(authorization.subscribe);
+		advancePastRefresh();
+		const result = await promise;
+		expect(result.results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			},
+			{
+				error: expect.objectContaining({
+					type: 'access-denied'
+				})
+			}
+		]);
 	});
 
 	it('passes a successful authorization to the subscription, then unsubscribes from authorization updates', async () => {
