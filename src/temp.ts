@@ -32,7 +32,7 @@ const authorization = authorizeWithKeycloak({
 	realm: ''
 });
 
-const result = authorization.subscribe(
+const subscription = authorization.subscribe(
 	() => null,
 	() => null
 );
