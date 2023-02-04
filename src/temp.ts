@@ -1,4 +1,4 @@
-import { RequiredRoles } from './core/types';
+import { RequiredRoles } from './core-old/types';
 import { KeycloakTokenParsed } from 'keycloak-js';
 import { KeycloakAuthError } from './errors/KeycloakAuthError';
 

@@ -3,9 +3,9 @@ import {
 	KeycloakAuthorization,
 	KeycloakAuthSubscribe,
 	KeycloakAuthSubscription
-} from '../../src/core/types';
+} from '../../src/core-old/types';
 import { MockKeycloak } from '../mocks/MockKeycloak';
-import { authorizeWithKeycloak } from '../../src/core/authorizeWithKeycloak';
+import { authorizeWithKeycloak } from '../../src/core-old/authorizeWithKeycloak';
 import {
 	ACCESS_TOKEN_EXP,
 	AUTH_SERVER_URL,
