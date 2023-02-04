@@ -1,8 +1,48 @@
 import { beforeEach, describe, it, vi } from 'vitest';
 import { ACCESS_TOKEN_EXP } from '../testutils/data';
+import { AuthorizeWithKeycloak } from '../../src/core/types';
+import react from '@vitejs/plugin-react';
+import { KeycloakAuthError } from '../../src/errors/KeycloakAuthError';
+import { KeycloakTokenParsed } from 'keycloak-js';
 
 const advancePastRefresh = () =>
 	vi.advanceTimersByTime(ACCESS_TOKEN_EXP * 1000 + 10);
+
+type Result = {
+	readonly token: string;
+	readonly tokenParsed: KeycloakTokenParsed;
+	readonly error: KeycloakAuthError;
+};
+
+const promisify =
+	(waitForResultCount: number) =>
+	(
+		authorize: AuthorizeWithKeycloak
+	): Promise<ReadonlyArray<Partial<Result>>> =>
+		new Promise((resolve) => {
+			const results: Partial<Result>[] = [];
+			authorize(
+				(token, tokenParsed) => {
+					results.push({
+						token,
+						tokenParsed
+					});
+
+					if (results.length >= waitForResultCount) {
+						resolve(results);
+					}
+				},
+				(error) => {
+					results.push({
+						error
+					});
+
+					if (results.length >= waitForResultCount) {
+						resolve(results);
+					}
+				}
+			);
+		});
 
 describe('authorization', () => {
 	beforeEach(() => {
