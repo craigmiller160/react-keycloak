@@ -2,8 +2,10 @@ import { beforeEach, describe, it, vi } from 'vitest';
 import {
 	ACCESS_TOKEN_EXP,
 	AUTH_SERVER_URL,
+	CLIENT_ACCESS_ROLE,
 	CLIENT_ID,
 	REALM,
+	REALM_ACCESS_ROLE,
 	TOKEN,
 	TOKEN_PARSED,
 	UNAUTHORIZED_ERROR
@@ -136,11 +138,41 @@ describe('authorization', () => {
 	});
 
 	it('handles a successful authorization with the required realm roles', async () => {
-		throw new Error();
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		const authorize = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			requiredRoles: {
+				realm: [REALM_ACCESS_ROLE]
+			}
+		});
+		const results = await promisify(1)(authorize);
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			}
+		]);
 	});
 
 	it('handles a successful authorization with the required client roles', async () => {
-		throw new Error();
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		const authorize = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			requiredRoles: {
+				client: [CLIENT_ACCESS_ROLE]
+			}
+		});
+		const results = await promisify(1)(authorize);
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			}
+		]);
 	});
 
 	it('handles a failed authorization because missing a required realm role', async () => {
