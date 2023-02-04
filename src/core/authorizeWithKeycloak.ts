@@ -1,5 +1,9 @@
-import { AuthorizeWithKeycloak } from './types';
-import Keycloak from 'keycloak-js';
+import {
+	AuthorizeWithKeycloak,
+	KeycloakAuthorization,
+	KeycloakAuthSubscription
+} from './types';
+import Keycloak, { KeycloakTokenParsed } from 'keycloak-js';
 import { KeycloakAuthConfig } from '../service/KeycloakAuthConfig';
 import { UnauthorizedError } from '../errors/UnauthorizedError';
 
@@ -9,6 +13,13 @@ type AuthContext = {
 	readonly state: AuthState;
 	readonly config: KeycloakAuthConfig;
 	readonly keycloak: Keycloak;
+};
+
+type InternalAuthorization = KeycloakAuthorization & {
+	isStopped: boolean;
+	token?: string;
+	tokenParsed?: KeycloakTokenParsed;
+	readonly subscriptions: KeycloakAuthSubscription[];
 };
 
 const handleAuthorizing = (context: AuthContext): Promise<AuthContext> =>
@@ -38,6 +49,15 @@ export const authorizeWithKeycloak: AuthorizeWithKeycloak = (config) => {
 		realm: config.realm,
 		clientId: config.clientId
 	});
+	const authorization: InternalAuthorization = {
+		isStopped: false,
+		subscriptions: [],
+		stop() {
+			this.subscriptions.splice(0, this.subscriptions.length);
+			this.isStopped = true;
+		},
+		logout: keycloak.logout
+	};
 	const promise = handleAuthStep({
 		config,
 		keycloak,
