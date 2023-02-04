@@ -23,6 +23,10 @@ export const createKeycloakAuthorization = (
 		};
 
 		keycloak.onAuthError = onFailure;
-		keycloak.onAuthRefreshError = onFailure;
+		keycloak.onAuthRefreshError = () =>
+			onFailure({
+				error: 'Refresh Error',
+				error_description: 'Failed to refresh token'
+			});
 	};
 };
