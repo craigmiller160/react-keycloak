@@ -110,6 +110,20 @@ describe('authorizeWithKeycloak', () => {
 				})
 			}
 		]);
+
+		expect(authorization).toEqual(
+			expect.objectContaining({
+				subscriptions: []
+			})
+		);
+		const result2 = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(result2.results).toEqual([
+			{
+				error: expect.objectContaining({
+					type: 'authorization-stopped'
+				})
+			}
+		]);
 	});
 
 	it('passes a successful authorization and a successful refresh to the subscription', async () => {
@@ -157,6 +171,20 @@ describe('authorizeWithKeycloak', () => {
 				})
 			}
 		]);
+
+		expect(authorization).toEqual(
+			expect.objectContaining({
+				subscriptions: []
+			})
+		);
+		const result2 = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(result2.results).toEqual([
+			{
+				error: expect.objectContaining({
+					type: 'authorization-stopped'
+				})
+			}
+		]);
 	});
 
 	it('passes a successful authorization and an access denied refresh to the subscription', async () => {
@@ -191,6 +219,20 @@ describe('authorizeWithKeycloak', () => {
 				})
 			}
 		]);
+
+		expect(authorization).toEqual(
+			expect.objectContaining({
+				subscriptions: []
+			})
+		);
+		const result2 = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(result2.results).toEqual([
+			{
+				error: expect.objectContaining({
+					type: 'authorization-stopped'
+				})
+			}
+		]);
 	});
 
 	it('passes a successful authorization to the subscription, then unsubscribes from authorization updates', async () => {
@@ -220,7 +262,6 @@ describe('authorizeWithKeycloak', () => {
 			})
 		);
 
-		// Ensuring refresh is still running
 		const promise2 = subscriptionToPromise(2)(authorization.subscribe);
 		advancePastRefresh();
 		const result2 = await promise2;
@@ -379,6 +420,20 @@ describe('authorizeWithKeycloak', () => {
 				})
 			}
 		]);
+
+		expect(authorization).toEqual(
+			expect.objectContaining({
+				subscriptions: []
+			})
+		);
+		const result2 = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(result2.results).toEqual([
+			{
+				error: expect.objectContaining({
+					type: 'authorization-stopped'
+				})
+			}
+		]);
 	});
 
 	it('passes an access denied error due to missing required client role to the subscription', async () => {
@@ -397,6 +452,20 @@ describe('authorizeWithKeycloak', () => {
 			{
 				error: expect.objectContaining({
 					type: 'access-denied'
+				})
+			}
+		]);
+
+		expect(authorization).toEqual(
+			expect.objectContaining({
+				subscriptions: []
+			})
+		);
+		const result2 = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(result2.results).toEqual([
+			{
+				error: expect.objectContaining({
+					type: 'authorization-stopped'
 				})
 			}
 		]);
