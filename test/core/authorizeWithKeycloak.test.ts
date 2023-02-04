@@ -1,13 +1,54 @@
 import { describe, it } from 'vitest';
-import { KeycloakAuthorization } from '../../src/core/types';
+import {
+	KeycloakAuthorization,
+	KeycloakAuthSubscribe
+} from '../../src/core/types';
 import { MockKeycloak } from '../mocks/MockKeycloak';
 import { authorizeWithKeycloak } from '../../src/core/authorizeWithKeycloak';
 import {
 	ACCESS_TOKEN_EXP,
 	AUTH_SERVER_URL,
 	CLIENT_ID,
-	REALM
+	REALM,
+	TOKEN,
+	TOKEN_PARSED
 } from '../testutils/data';
+import { KeycloakAuthError } from '../../src/errors/KeycloakAuthError';
+import { KeycloakTokenParsed } from 'keycloak-js';
+
+type SubscriptionResult = {
+	readonly token: string;
+	readonly tokenParsed: KeycloakTokenParsed;
+	readonly error: KeycloakAuthError;
+};
+
+const subscriptionToPromise =
+	(waitForResultCount: number) =>
+	(
+		subscribe: KeycloakAuthSubscribe
+	): Promise<Partial<SubscriptionResult>[]> =>
+		new Promise((resolve) => {
+			const results: Partial<SubscriptionResult>[] = [];
+			subscribe(
+				(token, tokenParsed) => {
+					results.push({
+						token,
+						tokenParsed
+					});
+					if (results.length >= waitForResultCount) {
+						resolve(results);
+					}
+				},
+				(error) => {
+					results.push({
+						error
+					});
+					if (results.length >= waitForResultCount) {
+						resolve(results);
+					}
+				}
+			);
+		});
 
 describe('authorizeWithKeycloak', () => {
 	let authorization: KeycloakAuthorization | undefined = undefined;
@@ -17,7 +58,7 @@ describe('authorizeWithKeycloak', () => {
 		}
 	});
 
-	it('passes a successful authorization to the subscription', () => {
+	it('passes a successful authorization to the subscription', async () => {
 		MockKeycloak.setAuthResult(true);
 		authorization = authorizeWithKeycloak({
 			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
@@ -25,7 +66,13 @@ describe('authorizeWithKeycloak', () => {
 			authServerUrl: AUTH_SERVER_URL,
 			clientId: CLIENT_ID
 		});
-		throw new Error();
+		const results = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			}
+		]);
 	});
 
 	it('passes an unauthorized error to the subscription', () => {

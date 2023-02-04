@@ -23,12 +23,13 @@ export type KeycloakAuthSuccessHandler = (
 	tokenParsed: KeycloakTokenParsed
 ) => void;
 export type KeycloakAuthFailedHandler = (error: KeycloakAuthError) => void;
+export type KeycloakAuthSubscribe = (
+	onSuccess: KeycloakAuthSuccessHandler,
+	onFailure: KeycloakAuthFailedHandler
+) => KeycloakAuthSubscription;
 
 export type KeycloakAuthorization = {
-	readonly subscribe: (
-		onSuccess: KeycloakAuthSuccessHandler,
-		onFailure: KeycloakAuthFailedHandler
-	) => KeycloakAuthSubscription;
+	readonly subscribe: KeycloakAuthSubscribe;
 	readonly stopRefreshAndSubscriptions: () => void;
 	readonly logout: () => void;
 };
