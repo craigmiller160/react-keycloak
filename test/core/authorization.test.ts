@@ -5,13 +5,13 @@ import {
 	CLIENT_ID,
 	REALM,
 	TOKEN,
-	TOKEN_PARSED
+	TOKEN_PARSED,
+	UNAUTHORIZED_ERROR
 } from '../testutils/data';
 import { AuthorizeWithKeycloak } from '../../src/core/types';
-import { KeycloakAuthError } from '../../src/errors/KeycloakAuthError';
 import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
 import { createKeycloakAuthorization } from '../../src/core';
-import {MockKeycloak} from '../mocks/MockKeycloak';
+import { MockKeycloak } from '../mocks/MockKeycloak';
 
 const advancePastRefresh = () =>
 	vi.advanceTimersByTime(ACCESS_TOKEN_EXP * 1000 + 10);
@@ -79,15 +79,60 @@ describe('authorization', () => {
 
 	it('handles a failed authorization', async () => {
 		MockKeycloak.setAuthResults(null);
-		throw new Error();
+		const authorize = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID
+		});
+		const results = await promisify(1)(authorize);
+		expect(results).toEqual([
+			{
+				error: UNAUTHORIZED_ERROR
+			}
+		]);
 	});
 
 	it('handles a successful authorization, and a successful refresh', async () => {
-		throw new Error();
+		MockKeycloak.setAuthResults(TOKEN_PARSED, TOKEN_PARSED);
+		const authorize = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID
+		});
+		const promise = promisify(2)(authorize);
+		advancePastRefresh();
+		const results = await promise;
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			},
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			}
+		]);
 	});
 
 	it('handles a successful authorization, and a failed refresh', async () => {
-		throw new Error();
+		MockKeycloak.setAuthResults(TOKEN_PARSED, null);
+		const authorize = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID
+		});
+		const promise = promisify(2)(authorize);
+		advancePastRefresh();
+		const results = await promise;
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			},
+			{
+				error: UNAUTHORIZED_ERROR
+			}
+		]);
 	});
 
 	it('handles a successful authorization with the required realm roles', async () => {
