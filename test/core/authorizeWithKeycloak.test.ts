@@ -98,6 +98,10 @@ describe('authorizeWithKeycloak', () => {
 		throw new Error();
 	});
 
+	it('has an error during authorization, but still runs refresh', async () => {
+		throw new Error();
+	});
+
 	it('passes an unauthorized error to the subscription', async () => {
 		MockKeycloak.setAuthResults(null);
 		authorization = authorizeWithKeycloak({
