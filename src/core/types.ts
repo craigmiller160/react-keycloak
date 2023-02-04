@@ -15,7 +15,7 @@ export type KeycloakAuthConfig = {
 };
 
 export type KeycloakAuthSubscription = {
-	readonly unsubscribe: (stopRefresh?: boolean) => void;
+	readonly unsubscribe: (stopAuthorization?: boolean) => void;
 };
 
 export type KeycloakAuthSuccessHandler = (
@@ -30,7 +30,7 @@ export type KeycloakAuthSubscribe = (
 
 export type KeycloakAuthorization = {
 	readonly subscribe: KeycloakAuthSubscribe;
-	readonly stopRefreshAndSubscriptions: () => void;
+	readonly stop: () => void;
 	readonly logout: () => void;
 };
 

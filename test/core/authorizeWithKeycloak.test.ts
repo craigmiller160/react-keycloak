@@ -72,7 +72,7 @@ describe('authorizeWithKeycloak', () => {
 	});
 	afterEach(() => {
 		if (authorization) {
-			authorization.stopRefreshAndSubscriptions();
+			authorization.stop();
 		}
 		vi.useRealTimers();
 	});
@@ -206,11 +206,49 @@ describe('authorizeWithKeycloak', () => {
 		]);
 	});
 
-	it('passes a successful authorization to the subscription, then unsubscribes AND cancels refresh at the same time', () => {
-		throw new Error();
+	it('passes a successful authorization to the subscription, then unsubscribes AND stops authorization at the same time', async () => {
+		MockKeycloak.setAuthResults(true, true);
+		authorization = authorizeWithKeycloak({
+			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID
+		});
+		const result = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(result.results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			}
+		]);
+		expect(authorization).toEqual(
+			expect.objectContaining({
+				subscriptions: [result.subscription]
+			})
+		);
+		result.subscription.unsubscribe(true);
+		expect(authorization).toEqual(
+			expect.objectContaining({
+				subscriptions: []
+			})
+		);
+
+		const result2 = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(authorization).toEqual(
+			expect.objectContaining({
+				subscriptions: []
+			})
+		);
+		expect(result2.results).toEqual([
+			{
+				error: expect.objectContaining({
+					type: 'authorization-stopped'
+				})
+			}
+		]);
 	});
 
-	it('passes a successful authorization to the subscription, then cancels refresh and all subscriptions from authorization', () => {
+	it('passes a successful authorization to the subscription, then stops authorization', () => {
 		throw new Error();
 	});
 
@@ -225,8 +263,8 @@ describe('authorizeWithKeycloak', () => {
 				realm: [REALM_ACCESS_ROLE]
 			}
 		});
-		const results = await subscriptionToPromise(1)(authorization.subscribe);
-		expect(results).toEqual([
+		const result = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(result.results).toEqual([
 			{
 				token: TOKEN,
 				tokenParsed: TOKEN_PARSED
@@ -245,8 +283,8 @@ describe('authorizeWithKeycloak', () => {
 				client: [CLIENT_ACCESS_ROLE]
 			}
 		});
-		const results = await subscriptionToPromise(1)(authorization.subscribe);
-		expect(results).toEqual([
+		const result = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(result.results).toEqual([
 			{
 				token: TOKEN,
 				tokenParsed: TOKEN_PARSED
@@ -265,8 +303,8 @@ describe('authorizeWithKeycloak', () => {
 				realm: ['abc']
 			}
 		});
-		const results = await subscriptionToPromise(1)(authorization.subscribe);
-		expect(results).toEqual([
+		const result = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(result.results).toEqual([
 			{
 				error: expect.objectContaining({
 					type: 'access-denied'
@@ -286,8 +324,8 @@ describe('authorizeWithKeycloak', () => {
 				client: ['abc']
 			}
 		});
-		const results = await subscriptionToPromise(1)(authorization.subscribe);
-		expect(results).toEqual([
+		const result = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(result.results).toEqual([
 			{
 				error: expect.objectContaining({
 					type: 'access-denied'
