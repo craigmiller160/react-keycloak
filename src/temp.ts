@@ -6,9 +6,16 @@ type KeycloakAuthSubscription = {
 	readonly unsubscribe: () => void;
 };
 
+type KeycloakAuthSuccessFn = (
+	token: string,
+	tokenParsed: KeycloakTokenParsed
+) => void;
+type KeycloakAuthFailedFn = (error: Error) => void;
+
 type KeycloakAuthorization = {
 	readonly subscribe: (
-		fn: (token: string, tokenParsed: KeycloakTokenParsed) => void
+		onSuccess: KeycloakAuthSuccessFn,
+		onFailure: KeycloakAuthFailedFn
 	) => KeycloakAuthSubscription;
 	readonly stopRefresh: () => void;
 	readonly logout: () => void;
@@ -25,4 +32,7 @@ const authorization = authorizeWithKeycloak({
 	realm: ''
 });
 
-const result = authorization.subscribe(() => null);
+const result = authorization.subscribe(
+	() => null,
+	() => null
+);
