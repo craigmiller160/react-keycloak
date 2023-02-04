@@ -207,7 +207,7 @@ describe('authorizeWithKeycloak', () => {
 	});
 
 	it('passes a successful authorization to the subscription, then unsubscribes AND stops authorization at the same time', async () => {
-		MockKeycloak.setAuthResults(true, true);
+		MockKeycloak.setAuthResults(true);
 		authorization = authorizeWithKeycloak({
 			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
 			realm: REALM,
@@ -248,8 +248,46 @@ describe('authorizeWithKeycloak', () => {
 		]);
 	});
 
-	it('passes a successful authorization to the subscription, then stops authorization', () => {
-		throw new Error();
+	it('passes a successful authorization to the subscription, then stops authorization', async () => {
+		MockKeycloak.setAuthResults(true);
+		authorization = authorizeWithKeycloak({
+			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID
+		});
+		const result = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(result.results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			}
+		]);
+		expect(authorization).toEqual(
+			expect.objectContaining({
+				subscriptions: [result.subscription]
+			})
+		);
+		authorization.stop();
+		expect(authorization).toEqual(
+			expect.objectContaining({
+				subscriptions: []
+			})
+		);
+
+		const result2 = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(authorization).toEqual(
+			expect.objectContaining({
+				subscriptions: []
+			})
+		);
+		expect(result2.results).toEqual([
+			{
+				error: expect.objectContaining({
+					type: 'authorization-stopped'
+				})
+			}
+		]);
 	});
 
 	it('passes a successful authorization with the required realm roles to the subscription', async () => {
