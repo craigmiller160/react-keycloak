@@ -9,7 +9,7 @@ import {
 } from '../testutils/data';
 import { AuthorizeWithKeycloak } from '../../src/core/types';
 import { KeycloakAuthError } from '../../src/errors/KeycloakAuthError';
-import { KeycloakTokenParsed } from 'keycloak-js';
+import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
 import { createKeycloakAuthorization } from '../../src/core';
 
 const advancePastRefresh = () =>
@@ -18,7 +18,7 @@ const advancePastRefresh = () =>
 type Result = {
 	readonly token: string;
 	readonly tokenParsed: KeycloakTokenParsed;
-	readonly error: KeycloakAuthError;
+	readonly error: KeycloakError;
 };
 
 const promisify =

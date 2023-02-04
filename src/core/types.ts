@@ -1,4 +1,4 @@
-import { KeycloakTokenParsed } from 'keycloak-js';
+import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
 import { KeycloakAuthError } from '../errors/KeycloakAuthError';
 
 export type RequiredRoles = {
@@ -17,7 +17,7 @@ export type KeycloakAuthSuccessHandler = (
 	token: string,
 	tokenParsed: KeycloakTokenParsed
 ) => void;
-export type KeycloakAuthFailedHandler = (error: KeycloakAuthError) => void;
+export type KeycloakAuthFailedHandler = (error: KeycloakError) => void;
 
 export type AuthorizeWithKeycloak = (
 	onSuccess: KeycloakAuthSuccessHandler,
