@@ -1,7 +1,8 @@
 import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest';
 import {
 	KeycloakAuthorization,
-	KeycloakAuthSubscribe
+	KeycloakAuthSubscribe,
+	KeycloakAuthSubscription
 } from '../../src/core/types';
 import { MockKeycloak } from '../mocks/MockKeycloak';
 import { authorizeWithKeycloak } from '../../src/core/authorizeWithKeycloak';
@@ -17,6 +18,10 @@ import {
 } from '../testutils/data';
 import { KeycloakAuthError } from '../../src/errors/KeycloakAuthError';
 import { KeycloakTokenParsed } from 'keycloak-js';
+
+type SubscriptionHolder = {
+	readonly subscriptions: KeycloakAuthSubscription[];
+};
 
 type SubscriptionResult = {
 	readonly token: string;
@@ -150,15 +155,15 @@ describe('authorizeWithKeycloak', () => {
 		throw new Error();
 	});
 
-	it('unsubscribes from authorization updates', () => {
+	it('passes a successful authorization to the subscription, then unsubscribes from authorization updates', () => {
 		throw new Error();
 	});
 
-	it('unsubscribes AND cancels refresh at the same time', () => {
+	it('passes a successful authorization to the subscription, then unsubscribes AND cancels refresh at the same time', () => {
 		throw new Error();
 	});
 
-	it('cancels refresh and all subscriptions from authorization', () => {
+	it('passes a successful authorization to the subscription, then cancels refresh and all subscriptions from authorization', () => {
 		throw new Error();
 	});
 
