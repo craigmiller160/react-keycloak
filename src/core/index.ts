@@ -12,12 +12,14 @@ export const createKeycloakAuthorization = (
 	return (onSuccess, onFailure) => {
 		keycloak.onAuthSuccess = () => {
 			// TODO check for roles
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			onSuccess(keycloak.token!, keycloak.tokenParsed!);
 			// TODO trigger the refresh
 		};
 
 		keycloak.onAuthRefreshSuccess = () => {
 			// TODO check for roles
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			onSuccess(keycloak.token!, keycloak.tokenParsed!);
 			// TODO trigger the next refresh
 		};
