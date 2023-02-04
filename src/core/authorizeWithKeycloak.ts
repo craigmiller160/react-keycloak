@@ -1,18 +1,9 @@
-import {
-	AuthorizeWithKeycloak,
-	KeycloakAuthFailedHandler,
-	KeycloakAuthorization,
-	KeycloakAuthSubscription,
-	KeycloakAuthSuccessHandler
-} from './types';
-import Keycloak, { KeycloakTokenParsed } from 'keycloak-js';
+import { AuthorizeWithKeycloak } from './types';
+import Keycloak from 'keycloak-js';
 import { KeycloakAuthConfig } from '../service/KeycloakAuthConfig';
-import { UnauthorizedError } from '../errors/UnauthorizedError';
-import { nanoid } from 'nanoid';
-import { AuthorizationStoppedError } from '../errors/AuthorizationStoppedError';
 import { InternalAuthorization } from './InternalAuthorization';
 
-type AuthState = 'authorizing' | 'authorized';
+type AuthState = 'authorizing' | 'authorized' | 'unauthorized';
 
 type AuthContext = {
 	readonly state: AuthState;
@@ -25,16 +16,24 @@ const handleAuthorizing = (context: AuthContext): Promise<AuthContext> =>
 		.init({ onLoad: 'login-required' })
 		.then((isSuccess) => {
 			if (isSuccess) {
-				return Promise.resolve({
+				return Promise.resolve<AuthContext>({
 					...context,
 					state: 'authorized'
 				});
 			}
-			return Promise.reject(new UnauthorizedError());
+			return Promise.resolve<AuthContext>({
+				...context,
+				state: 'unauthorized'
+			});
 		});
 
 const handleAuthorized = (context: AuthContext): Promise<AuthContext> => {
 	context.authorization.emitAuthorized();
+	return Promise.resolve(context);
+};
+
+const handleUnauthorized = (context: AuthContext): Promise<AuthContext> => {
+	context.authorization.emitUnauthorized();
 	return Promise.resolve(context);
 };
 
@@ -43,8 +42,10 @@ const handleAuthStep = (context: AuthContext): Promise<AuthContext> => {
 		case 'authorizing':
 			return handleAuthorizing(context).then(handleAuthStep);
 		case 'authorized':
-		default:
 			return handleAuthorized(context);
+		case 'unauthorized':
+		default:
+			return handleUnauthorized(context);
 	}
 };
 
