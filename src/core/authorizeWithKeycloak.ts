@@ -56,7 +56,7 @@ export const authorizeWithKeycloak: AuthorizeWithKeycloak = (config) => {
 		clientId: config.clientId
 	});
 	const authorization = new InternalAuthorization(keycloak);
-	const promise = handleAuthStep({
+	handleAuthStep({
 		config,
 		authorization,
 		state: 'authorizing'
