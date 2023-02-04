@@ -25,3 +25,8 @@ export const UNAUTHORIZED_ERROR: KeycloakError = {
 	error: 'Unauthorized',
 	error_description: 'You are unauthorized'
 };
+
+export const ACCESS_DENIED_ERROR: KeycloakError = {
+	error: 'Access Denied',
+	error_description: 'Your access to this app is denied'
+};

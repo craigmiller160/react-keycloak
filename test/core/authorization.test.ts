@@ -1,5 +1,6 @@
 import { beforeEach, describe, it, vi } from 'vitest';
 import {
+	ACCESS_DENIED_ERROR,
 	ACCESS_TOKEN_EXP,
 	AUTH_SERVER_URL,
 	CLIENT_ACCESS_ROLE,
@@ -214,10 +215,56 @@ describe('authorization', () => {
 	});
 
 	it('handles a successful authorization but a failed refresh because realm role removed', async () => {
-		throw new Error();
+		const newToken: KeycloakTokenParsed = {
+			...TOKEN_PARSED,
+			realm_access: {
+				roles: ['abc']
+			}
+		};
+		MockKeycloak.setAuthResults(TOKEN_PARSED, newToken);
+		const authorize = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			requiredRoles: {
+				realm: [REALM_ACCESS_ROLE]
+			}
+		});
+		const promise = promisify(2)(authorize);
+		advancePastRefresh();
+		const results = await promise;
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			},
+			{
+				error: ACCESS_DENIED_ERROR
+			}
+		]);
 	});
 
 	it('handles a successful authentication but a failed refresh because client role removed', async () => {
-		throw new Error();
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		const authorize = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			requiredRoles: {
+				client: [CLIENT_ACCESS_ROLE]
+			}
+		});
+		const promise = promisify(1)(authorize);
+		advancePastRefresh();
+		const results = await promise;
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			},
+			{
+				error: ACCESS_DENIED_ERROR
+			}
+		]);
 	});
 });
