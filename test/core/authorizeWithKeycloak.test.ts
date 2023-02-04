@@ -155,11 +155,45 @@ describe('authorizeWithKeycloak', () => {
 		]);
 	});
 
-	it('passes an access denied error due to missing required realm role to the subscription', () => {
-		throw new Error();
+	it('passes an access denied error due to missing required realm role to the subscription', async () => {
+		MockKeycloak.setAuthResult(true);
+		authorization = authorizeWithKeycloak({
+			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			requiredRoles: {
+				realm: ['abc']
+			}
+		});
+		const results = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(results).toEqual([
+			{
+				error: expect.objectContaining({
+					type: 'access-denied'
+				})
+			}
+		]);
 	});
 
-	it('passes an access denied error due to missing required client role to the subscription', () => {
-		throw new Error();
+	it('passes an access denied error due to missing required client role to the subscription', async () => {
+		MockKeycloak.setAuthResult(true);
+		authorization = authorizeWithKeycloak({
+			accessTokenExpirationSecs: ACCESS_TOKEN_EXP,
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			requiredRoles: {
+				client: ['abc']
+			}
+		});
+		const results = await subscriptionToPromise(1)(authorization.subscribe);
+		expect(results).toEqual([
+			{
+				error: expect.objectContaining({
+					type: 'access-denied'
+				})
+			}
+		]);
 	});
 });
