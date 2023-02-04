@@ -8,10 +8,12 @@ import { TOKEN, TOKEN_PARSED } from '../testutils/data';
 export class MockKeycloak {
 	static lastConfig?: KeycloakConfig = undefined;
 	static lastInit?: KeycloakInitOptions = undefined;
-	private static authResults: ReadonlyArray<boolean> = [];
+	private static authResults: ReadonlyArray<KeycloakTokenParsed | null> = [];
 
-	static setAuthResults(...authShouldSucceed: ReadonlyArray<boolean>) {
-		MockKeycloak.authResults = authShouldSucceed;
+	static setAuthResults(
+		...authResults: ReadonlyArray<KeycloakTokenParsed | null>
+	) {
+		MockKeycloak.authResults = authResults;
 	}
 
 	static reset() {
@@ -33,7 +35,9 @@ export class MockKeycloak {
 			throw new Error('Must initialize the static auth results');
 		}
 
-		if (MockKeycloak.authResults[this.currentAuthResult]) {
+		const authSuccess =
+			MockKeycloak.authResults[this.currentAuthResult] != null;
+		if (authSuccess) {
 			this.token = TOKEN;
 			this.tokenParsed = TOKEN_PARSED;
 		} else {
@@ -43,9 +47,7 @@ export class MockKeycloak {
 
 		this.currentAuthResult++;
 
-		return new Promise((resolve) =>
-			resolve(MockKeycloak.authResults[this.currentAuthResult])
-		);
+		return new Promise((resolve) => resolve(authSuccess));
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -56,7 +58,9 @@ export class MockKeycloak {
 			);
 		}
 
-		if (MockKeycloak.authResults[this.currentAuthResult]) {
+		const authSuccess =
+			MockKeycloak.authResults[this.currentAuthResult] != null;
+		if (authSuccess) {
 			this.token = TOKEN;
 			this.tokenParsed = TOKEN_PARSED;
 		} else {
@@ -65,9 +69,7 @@ export class MockKeycloak {
 		}
 
 		this.currentAuthResult++;
-		return new Promise((resolve) =>
-			resolve(MockKeycloak.authResults[this.currentAuthResult])
-		);
+		return new Promise((resolve) => resolve(authSuccess));
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-empty-function
