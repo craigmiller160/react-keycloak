@@ -1,4 +1,4 @@
-import { KeycloakTokenParsed } from 'keycloak-js';
+import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
 
 export const CLIENT_ID = 'test-client';
 export const AUTH_SERVER_URL = 'https://auth-server.com';
@@ -19,4 +19,9 @@ export const TOKEN_PARSED: KeycloakTokenParsed = {
 			roles: [CLIENT_ACCESS_ROLE]
 		}
 	}
+};
+
+export const UNAUTHORIZED_ERROR: KeycloakError = {
+	error: 'Unauthorized',
+	error_description: 'You are unauthorized'
 };

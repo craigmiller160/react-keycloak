@@ -1,9 +1,10 @@
 import type {
 	KeycloakConfig,
+	KeycloakError,
 	KeycloakInitOptions,
 	KeycloakTokenParsed
 } from 'keycloak-js';
-import { TOKEN, TOKEN_PARSED } from '../testutils/data';
+import {TOKEN, TOKEN_PARSED, UNAUTHORIZED_ERROR} from '../testutils/data';
 
 export class MockKeycloak {
 	static lastConfig?: KeycloakConfig = undefined;
@@ -52,7 +53,7 @@ export class MockKeycloak {
 		}
 
 		if (!authSuccess && this.onAuthError) {
-			this.onAuthError();
+			this.onAuthError(UNAUTHORIZED_ERROR);
 		}
 
 		return new Promise((resolve) => resolve(authSuccess));
@@ -83,7 +84,7 @@ export class MockKeycloak {
 		}
 
 		if (!authSuccess && this.onAuthRefreshError) {
-			this.onAuthRefreshError();
+			this.onAuthRefreshError(UNAUTHORIZED_ERROR);
 		}
 
 		return new Promise((resolve) => resolve(authSuccess));
@@ -94,9 +95,9 @@ export class MockKeycloak {
 
 	onAuthSuccess?: () => void;
 
-	onAuthError?: () => void;
+	onAuthError?: (error: KeycloakError) => void;
 
 	onAuthRefreshSuccess?: () => void;
 
-	onAuthRefreshError?: () => void;
+	onAuthRefreshError?: (error: KeycloakError) => void;
 }

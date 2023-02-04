@@ -11,6 +11,7 @@ import { AuthorizeWithKeycloak } from '../../src/core/types';
 import { KeycloakAuthError } from '../../src/errors/KeycloakAuthError';
 import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
 import { createKeycloakAuthorization } from '../../src/core';
+import {MockKeycloak} from '../mocks/MockKeycloak';
 
 const advancePastRefresh = () =>
 	vi.advanceTimersByTime(ACCESS_TOKEN_EXP * 1000 + 10);
@@ -61,6 +62,7 @@ describe('authorization', () => {
 	});
 
 	it('handles a successful authorization', async () => {
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
 		const authorize = createKeycloakAuthorization({
 			realm: REALM,
 			authServerUrl: AUTH_SERVER_URL,
@@ -76,6 +78,7 @@ describe('authorization', () => {
 	});
 
 	it('handles a failed authorization', async () => {
+		MockKeycloak.setAuthResults(null);
 		throw new Error();
 	});
 
