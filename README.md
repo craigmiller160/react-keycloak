@@ -13,7 +13,8 @@ const App = () => (
     <KeycloakAuthProvider
         realm={REALM}
         clientId={CLIENT_ID}
-        requiredRoles={requiredRoles} // Optional
+        requiredRoles={REQUIRED_ROLES} // Optional
+        authServerUrl={AUTH_SERVER_URL} // Optional override, defaults to deployed auth server
     >
         <div />
     </KeycloakAuthProvider>
