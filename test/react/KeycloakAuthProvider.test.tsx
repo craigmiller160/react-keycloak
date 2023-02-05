@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, afterEach } from 'vitest';
+import { beforeEach, describe, expect, it, afterEach, Mock } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import {
 	KeycloakAuthContext,
@@ -16,6 +16,8 @@ import {
 	TOKEN,
 	REALM_ACCESS_ROLE
 } from '../testutils/data';
+import { navigate } from '../../src/utils/navigate';
+import { ACCESS_DENIED_URL } from '../../src/core/constants';
 
 const KeycloakRenderer = () => {
 	const { status, token, tokenParsed, error } =
@@ -33,6 +35,8 @@ const KeycloakRenderer = () => {
 type RenderConfig = {
 	readonly requiredRoles?: Partial<RequiredRoles>;
 	readonly localStorageKey?: string;
+	readonly doAccessDeniedRedirect?: boolean;
+	readonly accessDeniedUrl?: string;
 };
 
 const doRender = (config?: RenderConfig) =>
@@ -43,14 +47,19 @@ const doRender = (config?: RenderConfig) =>
 			clientId={CLIENT_ID}
 			requiredRoles={config?.requiredRoles}
 			localStorageKey={config?.localStorageKey}
+			doAccessDeniedRedirect={config?.doAccessDeniedRedirect}
+			accessDeniedUrl={config?.accessDeniedUrl}
 		>
 			<KeycloakRenderer />
 		</KeycloakAuthProvider>
 	);
 
+const navigateMock = navigate as Mock<[string], void>;
+
 describe('KeycloakAuthProvider', () => {
 	beforeEach(() => {
 		localStorage.clear();
+		navigateMock.mockClear();
 	});
 
 	afterEach(() => {
@@ -138,6 +147,57 @@ describe('KeycloakAuthProvider', () => {
 		expect(screen.getByText(/Token:/)).toHaveTextContent('false');
 		expect(screen.getByText(/Token Parsed/)).toHaveTextContent('false');
 		expect(screen.getByText(/Error/)).toHaveTextContent('true');
+
+		expect(navigateMock).toHaveBeenCalledWith(ACCESS_DENIED_URL);
+	});
+
+	it('handles a failed authorization due to required roles, but with redirect disabled', async () => {
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		doRender({
+			localStorageKey: LOCAL_STORAGE_KEY,
+			doAccessDeniedRedirect: false,
+			requiredRoles: {
+				realm: ['abc']
+			}
+		});
+		await waitFor(() =>
+			expect(MockKeycloak.lastConfig).not.toBeUndefined()
+		);
+		expect(MockKeycloak.lastConfig).toEqual({
+			url: MOCK_AUTH_SERVER_URL,
+			realm: REALM,
+			clientId: CLIENT_ID
+		});
+		expect(screen.getByText(/Token:/)).toHaveTextContent('false');
+		expect(screen.getByText(/Token Parsed/)).toHaveTextContent('false');
+		expect(screen.getByText(/Error/)).toHaveTextContent('true');
+
+		expect(navigateMock).not.toHaveBeenCalled();
+	});
+
+	it('handles a failed authorization due to required roles, but with custom redirect url', async () => {
+		const accessDeniedUrl = 'https://foobar.com';
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		doRender({
+			localStorageKey: LOCAL_STORAGE_KEY,
+			accessDeniedUrl,
+			requiredRoles: {
+				realm: ['abc']
+			}
+		});
+		await waitFor(() =>
+			expect(MockKeycloak.lastConfig).not.toBeUndefined()
+		);
+		expect(MockKeycloak.lastConfig).toEqual({
+			url: MOCK_AUTH_SERVER_URL,
+			realm: REALM,
+			clientId: CLIENT_ID
+		});
+		expect(screen.getByText(/Token:/)).toHaveTextContent('false');
+		expect(screen.getByText(/Token Parsed/)).toHaveTextContent('false');
+		expect(screen.getByText(/Error/)).toHaveTextContent('true');
+
+		expect(navigateMock).toHaveBeenCalledWith(accessDeniedUrl);
 	});
 
 	it('handles a failed authentication', async () => {

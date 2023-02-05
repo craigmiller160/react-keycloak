@@ -1,13 +1,11 @@
-import { beforeEach, describe, it, vi, afterEach, expect } from 'vitest';
+import { beforeEach, describe, it, vi, afterEach, expect, Mock } from 'vitest';
 import {
-	ACCESS_DENIED_ERROR,
 	ACCESS_TOKEN_EXP,
 	MOCK_AUTH_SERVER_URL,
 	CLIENT_ACCESS_ROLE,
 	CLIENT_ID,
 	REALM,
 	REALM_ACCESS_ROLE,
-	REFRESH_ERROR,
 	TOKEN,
 	TOKEN_PARSED,
 	UNAUTHORIZED_ERROR,
@@ -17,7 +15,13 @@ import { AuthorizeWithKeycloak } from '../../src/core/types';
 import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
 import { createKeycloakAuthorization } from '../../src/core';
 import { MockKeycloak } from '../mocks/MockKeycloak';
-import { AUTH_SERVER_URL } from '../../src/core/constants';
+import {
+	ACCESS_DENIED_ERROR,
+	ACCESS_DENIED_URL,
+	AUTH_SERVER_URL,
+	REFRESH_ERROR
+} from '../../src/core/constants';
+import { navigate } from '../../src/utils/navigate';
 
 const advancePastRefresh = () =>
 	vi.advanceTimersByTime((ACCESS_TOKEN_EXP - 30) * 1000 + 10);
@@ -27,6 +31,8 @@ type Result = {
 	readonly tokenParsed: KeycloakTokenParsed;
 	readonly error: KeycloakError;
 };
+
+const navigateMock = navigate as Mock<[string], void>;
 
 const promisify =
 	(waitForResultCount: number) =>
@@ -62,6 +68,7 @@ describe('authorization', () => {
 	beforeEach(() => {
 		vi.useFakeTimers();
 		localStorage.clear();
+		navigateMock.mockClear();
 	});
 
 	afterEach(() => {
@@ -229,12 +236,14 @@ describe('authorization', () => {
 		]);
 	});
 
-	it('handles a failed authorization because missing a required realm role', async () => {
+	it('handles a failed authorization because missing a required realm role, and clears localStorage', async () => {
+		localStorage.setItem(LOCAL_STORAGE_KEY, 'abc');
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
 			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
+			localStorageKey: LOCAL_STORAGE_KEY,
 			requiredRoles: {
 				realm: ['abc']
 			}
@@ -246,9 +255,12 @@ describe('authorization', () => {
 				error: ACCESS_DENIED_ERROR
 			}
 		]);
+
+		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toBeNull();
 	});
 
 	it('handles a failed authorization because missing a required client role', async () => {
+		localStorage.setItem(LOCAL_STORAGE_KEY, 'abc');
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
@@ -265,6 +277,54 @@ describe('authorization', () => {
 				error: ACCESS_DENIED_ERROR
 			}
 		]);
+
+		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toEqual('abc');
+		expect(navigateMock).toHaveBeenCalledWith(ACCESS_DENIED_URL);
+	});
+
+	it('handles a failed authorization because missing a client role, but with redirect disabled', async () => {
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			doAccessDeniedRedirect: false,
+			requiredRoles: {
+				client: ['abc']
+			}
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const results = await promisify(1)(authorize);
+		expect(results).toEqual([
+			{
+				error: ACCESS_DENIED_ERROR
+			}
+		]);
+
+		expect(navigateMock).not.toHaveBeenCalled();
+	});
+
+	it('handles a failed authorization because missing a client role, but with custom redirect url', async () => {
+		const accessDeniedUrl = 'https://foobar.com';
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			accessDeniedUrl,
+			requiredRoles: {
+				client: ['abc']
+			}
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const results = await promisify(1)(authorize);
+		expect(results).toEqual([
+			{
+				error: ACCESS_DENIED_ERROR
+			}
+		]);
+
+		expect(navigateMock).toHaveBeenCalledWith(accessDeniedUrl);
 	});
 
 	it('handles a successful authorization but a failed refresh because realm role removed', async () => {

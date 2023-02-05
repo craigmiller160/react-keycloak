@@ -16,6 +16,8 @@ const App = () => (
         requiredRoles={REQUIRED_ROLES} // Optional
         authServerUrl={AUTH_SERVER_URL} // Optional override, defaults to deployed auth server
         localStorageKey={LOCAL_STORAGE_KEY} // Optional, if provided the token will always be put in local storage with this key
+        doAccessDeniedRedirect={true} // Optional, will redirect to access denied page if true, defaults to true
+        accessDeniedUrl={ACCESS_DENIED_URL} // Optional, if doAccessDeniedRedirect is true, this is the redirect destiation. Defaults to environment redirect page app
     >
         <div />
     </KeycloakAuthProvider>
