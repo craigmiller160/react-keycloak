@@ -4,7 +4,7 @@ import {
 	KeycloakAuthConfig,
 	RequiredRoles
 } from './types';
-import Keycloak from 'keycloak-js';
+import Keycloak, { KeycloakError } from 'keycloak-js';
 import { newDate } from '../utils/newDate';
 import { AUTH_SERVER_URL } from './constants';
 
@@ -63,11 +63,18 @@ export const createKeycloakAuthorization: CreateKeycloakAuthorization = (
 			setTimeout(() => keycloak.updateToken(40), exp - current - 30_000);
 		};
 
+		const handleOnFailure = (error: KeycloakError) => {
+			if (config.localStorageKey) {
+				localStorage.removeItem(config.localStorageKey);
+			}
+			onFailure(error);
+		};
+
 		keycloak.onAuthSuccess = handleOnSuccess;
 		keycloak.onAuthRefreshSuccess = handleOnSuccess;
-		keycloak.onAuthError = onFailure;
+		keycloak.onAuthError = handleOnFailure;
 		keycloak.onAuthRefreshError = () =>
-			onFailure({
+			handleOnFailure({
 				error: 'Refresh Error',
 				error_description: 'Failed to refresh token'
 			});
