@@ -34,7 +34,9 @@ export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
 				clientId: props.clientId,
 				authServerUrl: props.authServerUrl,
 				requiredRoles: props.requiredRoles,
-				localStorageKey: props.localStorageKey
+				localStorageKey: props.localStorageKey,
+				doAccessDeniedRedirect: props.doAccessDeniedRedirect,
+				accessDeniedUrl: props.accessDeniedUrl
 			});
 			setState((prevState) => ({
 				...prevState,
@@ -69,7 +71,9 @@ export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
 		props.clientId,
 		props.authServerUrl,
 		props.requiredRoles,
-		props.localStorageKey
+		props.localStorageKey,
+		props.doAccessDeniedRedirect,
+		props.accessDeniedUrl
 	]);
 
 	return (
