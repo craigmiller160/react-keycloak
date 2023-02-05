@@ -1,4 +1,5 @@
 import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
+import { newDate } from '../../src/utils/newDate';
 
 export const CLIENT_ID = 'test-client';
 export const AUTH_SERVER_URL = 'https://auth-server.com';
@@ -18,7 +19,8 @@ export const TOKEN_PARSED: KeycloakTokenParsed = {
 		[CLIENT_ID]: {
 			roles: [CLIENT_ACCESS_ROLE]
 		}
-	}
+	},
+	exp: newDate().getTime() / 1000 + ACCESS_TOKEN_EXP
 };
 
 export const UNAUTHORIZED_ERROR: KeycloakError = {
