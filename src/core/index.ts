@@ -48,6 +48,11 @@ export const createKeycloakAuthorization: CreateKeycloakAuthorization = (
 				return;
 			}
 
+			if (config.localStorageKey) {
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+				localStorage.setItem(config.localStorageKey, keycloak.token!);
+			}
+
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			onSuccess(keycloak.token!, keycloak.tokenParsed!);
 
