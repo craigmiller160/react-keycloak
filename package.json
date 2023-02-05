@@ -13,7 +13,7 @@
     "prepare": "husky install",
     "lint": "eslint --fix --max-warnings=0 **/**.{ts,tsx}",
     "force-build": "tsc",
-    "build": "yarn lint && yarn force-build",
+    "build": "yarn lint && yarn test && yarn force-build",
     "test": "vitest"
   },
   "lint-staged": {
