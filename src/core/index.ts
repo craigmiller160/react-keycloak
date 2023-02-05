@@ -18,17 +18,21 @@ import { navigate } from '../utils/navigate';
 
 const hasRequiredRoles = (
 	keycloak: Keycloak,
-	clientId: string,
 	requiredRoles?: Partial<RequiredRoles>
 ): boolean => {
 	const hasRequiredRealmRoles =
 		(requiredRoles?.realm ?? []).filter(
 			(role) => !keycloak.hasRealmRole(role)
 		).length === 0;
+
 	const hasRequiredClientRoles =
-		(requiredRoles?.client ?? []).filter(
-			(role) => !keycloak.hasResourceRole(role, clientId)
-		).length === 0;
+		Object.entries(requiredRoles?.client ?? {})
+			.flatMap(([clientId, roles]) =>
+				roles.map((role) => [clientId, role])
+			)
+			.filter(
+				([clientId, role]) => !keycloak.hasResourceRole(role, clientId)
+			).length === 0;
 	return hasRequiredRealmRoles && hasRequiredClientRoles;
 };
 
@@ -39,9 +43,7 @@ const createHandleOnSuccess =
 		onFailure: KeycloakAuthFailedHandler
 	) =>
 	() => {
-		if (
-			!hasRequiredRoles(keycloak, config.clientId, config.requiredRoles)
-		) {
+		if (!hasRequiredRoles(keycloak, config.requiredRoles)) {
 			onFailure(ACCESS_DENIED_ERROR);
 			return;
 		}
