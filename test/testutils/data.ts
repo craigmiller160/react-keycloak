@@ -17,7 +17,7 @@ export const TOKEN_PARSED: KeycloakTokenParsed = {
 		roles: [REALM_ACCESS_ROLE]
 	},
 	resource_access: {
-		[CLIENT_ID]: {
+		[CLIENT_ACCESS_ID]: {
 			roles: [CLIENT_ACCESS_ROLE]
 		}
 	},
