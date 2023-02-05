@@ -67,11 +67,12 @@ describe('authorization', () => {
 
 	it('handles a successful authorization', async () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
-		const authorize = createKeycloakAuthorization({
+		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
 			authServerUrl: AUTH_SERVER_URL,
 			clientId: CLIENT_ID
 		});
+		expect(logout).toBeInstanceOf(Function);
 		const results = await promisify(1)(authorize);
 		expect(results).toEqual([
 			{
@@ -83,11 +84,12 @@ describe('authorization', () => {
 
 	it('handles a failed authorization', async () => {
 		MockKeycloak.setAuthResults(null);
-		const authorize = createKeycloakAuthorization({
+		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
 			authServerUrl: AUTH_SERVER_URL,
 			clientId: CLIENT_ID
 		});
+		expect(logout).toBeInstanceOf(Function);
 		const results = await promisify(1)(authorize);
 		expect(results).toEqual([
 			{
@@ -98,11 +100,12 @@ describe('authorization', () => {
 
 	it('handles a successful authorization, and a successful refresh', async () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED, TOKEN_PARSED);
-		const authorize = createKeycloakAuthorization({
+		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
 			authServerUrl: AUTH_SERVER_URL,
 			clientId: CLIENT_ID
 		});
+		expect(logout).toBeInstanceOf(Function);
 		const promise = promisify(2)(authorize);
 		advancePastRefresh();
 		const results = await promise;
@@ -120,11 +123,12 @@ describe('authorization', () => {
 
 	it('handles a successful authorization, and a failed refresh', async () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED, null);
-		const authorize = createKeycloakAuthorization({
+		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
 			authServerUrl: AUTH_SERVER_URL,
 			clientId: CLIENT_ID
 		});
+		expect(logout).toBeInstanceOf(Function);
 		const promise = promisify(2)(authorize);
 		advancePastRefresh();
 		const results = await promise;
@@ -141,7 +145,7 @@ describe('authorization', () => {
 
 	it('handles a successful authorization with the required realm roles', async () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
-		const authorize = createKeycloakAuthorization({
+		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
 			authServerUrl: AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
@@ -149,6 +153,7 @@ describe('authorization', () => {
 				realm: [REALM_ACCESS_ROLE]
 			}
 		});
+		expect(logout).toBeInstanceOf(Function);
 		const results = await promisify(1)(authorize);
 		expect(results).toEqual([
 			{
@@ -160,7 +165,7 @@ describe('authorization', () => {
 
 	it('handles a successful authorization with the required client roles', async () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
-		const authorize = createKeycloakAuthorization({
+		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
 			authServerUrl: AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
@@ -168,6 +173,7 @@ describe('authorization', () => {
 				client: [CLIENT_ACCESS_ROLE]
 			}
 		});
+		expect(logout).toBeInstanceOf(Function);
 		const results = await promisify(1)(authorize);
 		expect(results).toEqual([
 			{
@@ -179,7 +185,7 @@ describe('authorization', () => {
 
 	it('handles a failed authorization because missing a required realm role', async () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
-		const authorize = createKeycloakAuthorization({
+		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
 			authServerUrl: AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
@@ -187,6 +193,7 @@ describe('authorization', () => {
 				realm: ['abc']
 			}
 		});
+		expect(logout).toBeInstanceOf(Function);
 		const results = await promisify(1)(authorize);
 		expect(results).toEqual([
 			{
@@ -197,7 +204,7 @@ describe('authorization', () => {
 
 	it('handles a failed authorization because missing a required client role', async () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
-		const authorize = createKeycloakAuthorization({
+		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
 			authServerUrl: AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
@@ -205,6 +212,7 @@ describe('authorization', () => {
 				client: ['abc']
 			}
 		});
+		expect(logout).toBeInstanceOf(Function);
 		const results = await promisify(1)(authorize);
 		expect(results).toEqual([
 			{
@@ -221,7 +229,7 @@ describe('authorization', () => {
 			}
 		};
 		MockKeycloak.setAuthResults(TOKEN_PARSED, newToken);
-		const authorize = createKeycloakAuthorization({
+		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
 			authServerUrl: AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
@@ -229,6 +237,7 @@ describe('authorization', () => {
 				realm: [REALM_ACCESS_ROLE]
 			}
 		});
+		expect(logout).toBeInstanceOf(Function);
 		const promise = promisify(2)(authorize);
 		advancePastRefresh();
 		const results = await promise;
@@ -253,7 +262,7 @@ describe('authorization', () => {
 			}
 		};
 		MockKeycloak.setAuthResults(TOKEN_PARSED, newToken);
-		const authorize = createKeycloakAuthorization({
+		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
 			authServerUrl: AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
@@ -261,6 +270,7 @@ describe('authorization', () => {
 				client: [CLIENT_ACCESS_ROLE]
 			}
 		});
+		expect(logout).toBeInstanceOf(Function);
 		const promise = promisify(1)(authorize);
 		advancePastRefresh();
 		const results = await promise;
