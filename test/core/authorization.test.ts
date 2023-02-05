@@ -1,4 +1,4 @@
-import { beforeEach, describe, it, vi, afterEach } from 'vitest';
+import { beforeEach, describe, it, vi, afterEach, expect } from 'vitest';
 import {
 	ACCESS_DENIED_ERROR,
 	ACCESS_TOKEN_EXP,
