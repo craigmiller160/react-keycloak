@@ -18,7 +18,6 @@ export const createKeycloakAuthorization = (
 			const current = newDate().getTime();
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			const exp = keycloak.tokenParsed!.exp! * 1000;
-			console.log('EXP', exp - current);
 			setTimeout(() => keycloak.updateToken(40), exp - current - 30_000);
 		};
 

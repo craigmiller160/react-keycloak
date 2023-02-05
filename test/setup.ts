@@ -10,7 +10,7 @@ afterEach(() => {
 	cleanup();
 });
 
-vi.mock('../../src/utils/newDate', () => {
+vi.mock('../src/utils/newDate', () => {
 	const date = new Date();
 	return {
 		newDate: () => date
