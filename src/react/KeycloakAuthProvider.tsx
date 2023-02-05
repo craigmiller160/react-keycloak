@@ -10,7 +10,7 @@ export const KeycloakAuthProvider = (
 	props: PropsWithChildren<KeycloakAuthConfig>
 ) => {
 	const [state, setState] = useState<ProviderState>({
-		status: 'authorizing'
+		status: 'pre-auth'
 	});
 
 	const [authorize, logout] = useMemo(
@@ -20,7 +20,12 @@ export const KeycloakAuthProvider = (
 	);
 
 	useEffect(() => {
-		if (state.status === 'authorizing') {
+		if (state.status === 'pre-auth') {
+			setState((prevState) => ({
+				...prevState,
+				status: 'authorizing'
+			}));
+		} else if (state.status === 'authorizing') {
 			authorize(
 				(token, tokenParsed) =>
 					setState((prevState) => ({
