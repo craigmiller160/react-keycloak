@@ -7,6 +7,7 @@ export const ACCESS_TOKEN_EXP = 60;
 export const REALM = 'realm';
 export const LOCAL_STORAGE_KEY = 'local-storage-key';
 export const REALM_ACCESS_ROLE = 'realm-access';
+export const CLIENT_ACCESS_ID = 'other-client-id';
 export const CLIENT_ACCESS_ROLE = 'client-access';
 
 export const TOKEN = 'ABCDEFG';
@@ -16,7 +17,7 @@ export const TOKEN_PARSED: KeycloakTokenParsed = {
 		roles: [REALM_ACCESS_ROLE]
 	},
 	resource_access: {
-		[CLIENT_ID]: {
+		[CLIENT_ACCESS_ID]: {
 			roles: [CLIENT_ACCESS_ROLE]
 		}
 	},
