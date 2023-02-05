@@ -10,6 +10,8 @@ type Props = {
 	readonly clientId: string;
 	readonly localStorageKey?: string;
 	readonly requiredRoles?: Partial<RequiredRoles>;
+	readonly doAccessDeniedRedirect?: boolean;
+	readonly accessDeniedUrl?: string;
 };
 
 type ProviderState = KeycloakAuth & {
