@@ -8,7 +8,11 @@ import {
 } from './types';
 import Keycloak, { KeycloakError } from 'keycloak-js';
 import { newDate } from '../utils/newDate';
-import { AUTH_SERVER_URL } from './constants';
+import {
+	ACCESS_DENIED_ERROR,
+	AUTH_SERVER_URL,
+	REFRESH_ERROR
+} from './constants';
 
 const hasRequiredRoles = (
 	keycloak: Keycloak,
@@ -36,10 +40,7 @@ const createHandleOnSuccess =
 		if (
 			!hasRequiredRoles(keycloak, config.clientId, config.requiredRoles)
 		) {
-			onFailure({
-				error: 'Access Denied',
-				error_description: 'Your access to this app is denied'
-			});
+			onFailure(ACCESS_DENIED_ERROR);
 			return;
 		}
 
@@ -89,10 +90,7 @@ export const createKeycloakAuthorization: CreateKeycloakAuthorization = (
 		);
 		keycloak.onAuthError = handleOnFailure(onFailure);
 		keycloak.onAuthRefreshError = () =>
-			handleOnFailure(onFailure)({
-				error: 'Refresh Error',
-				error_description: 'Failed to refresh token'
-			});
+			handleOnFailure(onFailure)(REFRESH_ERROR);
 
 		keycloak.init({ onLoad: 'login-required' });
 	};
