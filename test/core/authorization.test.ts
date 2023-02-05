@@ -1,13 +1,11 @@
 import { beforeEach, describe, it, vi, afterEach, expect, Mock } from 'vitest';
 import {
-	ACCESS_DENIED_ERROR,
 	ACCESS_TOKEN_EXP,
 	MOCK_AUTH_SERVER_URL,
 	CLIENT_ACCESS_ROLE,
 	CLIENT_ID,
 	REALM,
 	REALM_ACCESS_ROLE,
-	REFRESH_ERROR,
 	TOKEN,
 	TOKEN_PARSED,
 	UNAUTHORIZED_ERROR,
@@ -17,7 +15,12 @@ import { AuthorizeWithKeycloak } from '../../src/core/types';
 import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
 import { createKeycloakAuthorization } from '../../src/core';
 import { MockKeycloak } from '../mocks/MockKeycloak';
-import { ACCESS_DENIED_URL, AUTH_SERVER_URL } from '../../src/core/constants';
+import {
+	ACCESS_DENIED_ERROR,
+	ACCESS_DENIED_URL,
+	AUTH_SERVER_URL,
+	REFRESH_ERROR
+} from '../../src/core/constants';
 import { navigate } from '../../src/utils/navigate';
 
 const advancePastRefresh = () =>
