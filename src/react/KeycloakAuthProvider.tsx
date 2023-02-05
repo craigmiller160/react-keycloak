@@ -1,35 +1,32 @@
-import { PropsWithChildren, useEffect, useState } from 'react';
+import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { KeycloakAuthContext } from './KeycloakAuthContext';
 import type { KeycloakAuth } from './types';
-import { AuthorizeWithKeycloak, KeycloakAuthConfig } from '../core/types';
+import { KeycloakAuthConfig } from '../core/types';
 import { createKeycloakAuthorization } from '../core';
 
-type ProviderState = KeycloakAuth & {
-	readonly authorize: AuthorizeWithKeycloak;
-};
+type ProviderState = Omit<KeycloakAuth, 'logout'>;
 
 export const KeycloakAuthProvider = (
 	props: PropsWithChildren<KeycloakAuthConfig>
 ) => {
 	const [state, setState] = useState<ProviderState>({
-		status: 'pre-auth',
-		// eslint-disable-next-line @typescript-eslint/no-empty-function
-		logout: () => {},
-		// eslint-disable-next-line @typescript-eslint/no-empty-function
-		authorize: () => {}
+		status: 'pre-auth'
 	});
+
+	const [authorize, logout] = useMemo(
+		() => createKeycloakAuthorization(props),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[JSON.stringify(props)]
+	);
 
 	useEffect(() => {
 		if (state.status === 'pre-auth') {
-			const [authorize, logout] = createKeycloakAuthorization(props);
 			setState((prevState) => ({
 				...prevState,
-				status: 'authorizing',
-				authorize,
-				logout
+				status: 'authorizing'
 			}));
 		} else if (state.status === 'authorizing') {
-			state.authorize(
+			authorize(
 				(token, tokenParsed) =>
 					setState((prevState) => ({
 						...prevState,
@@ -49,10 +46,15 @@ export const KeycloakAuthProvider = (
 					}))
 			);
 		}
-	}, [state, props]);
+	}, [state, authorize]);
+
+	const authValue: KeycloakAuth = {
+		...state,
+		logout
+	};
 
 	return (
-		<KeycloakAuthContext.Provider value={state}>
+		<KeycloakAuthContext.Provider value={authValue}>
 			{props.children}
 		</KeycloakAuthContext.Provider>
 	);
