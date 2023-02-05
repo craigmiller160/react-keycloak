@@ -1,51 +1,27 @@
-import { PropsWithChildren, useEffect, useState } from 'react';
+import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { KeycloakAuthContext } from './KeycloakAuthContext';
 import type { KeycloakAuth } from './types';
-import { AuthorizeWithKeycloak, RequiredRoles } from '../core/types';
+import { KeycloakAuthConfig } from '../core/types';
 import { createKeycloakAuthorization } from '../core';
 
-type Props = {
-	readonly realm: string;
-	readonly authServerUrl?: string;
-	readonly clientId: string;
-	readonly localStorageKey?: string;
-	readonly requiredRoles?: Partial<RequiredRoles>;
-	readonly doAccessDeniedRedirect?: boolean;
-	readonly accessDeniedUrl?: string;
-};
+type ProviderState = Omit<KeycloakAuth, 'logout'>;
 
-type ProviderState = KeycloakAuth & {
-	readonly authorize: AuthorizeWithKeycloak;
-};
-
-export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
+export const KeycloakAuthProvider = (
+	props: PropsWithChildren<KeycloakAuthConfig>
+) => {
 	const [state, setState] = useState<ProviderState>({
-		status: 'pre-auth',
-		// eslint-disable-next-line @typescript-eslint/no-empty-function
-		logout: () => {},
-		// eslint-disable-next-line @typescript-eslint/no-empty-function
-		authorize: () => {}
+		status: 'authorizing'
 	});
 
+	const [authorize, logout] = useMemo(
+		() => createKeycloakAuthorization(props),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[JSON.stringify(props)]
+	);
+
 	useEffect(() => {
-		if (state.status === 'pre-auth') {
-			const [authorize, logout] = createKeycloakAuthorization({
-				realm: props.realm,
-				clientId: props.clientId,
-				authServerUrl: props.authServerUrl,
-				requiredRoles: props.requiredRoles,
-				localStorageKey: props.localStorageKey,
-				doAccessDeniedRedirect: props.doAccessDeniedRedirect,
-				accessDeniedUrl: props.accessDeniedUrl
-			});
-			setState((prevState) => ({
-				...prevState,
-				status: 'authorizing',
-				authorize,
-				logout
-			}));
-		} else if (state.status === 'authorizing') {
-			state.authorize(
+		if (state.status === 'authorizing') {
+			authorize(
 				(token, tokenParsed) =>
 					setState((prevState) => ({
 						...prevState,
@@ -65,19 +41,15 @@ export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
 					}))
 			);
 		}
-	}, [
-		state,
-		props.realm,
-		props.clientId,
-		props.authServerUrl,
-		props.requiredRoles,
-		props.localStorageKey,
-		props.doAccessDeniedRedirect,
-		props.accessDeniedUrl
-	]);
+	}, [state, authorize]);
+
+	const authValue: KeycloakAuth = {
+		...state,
+		logout
+	};
 
 	return (
-		<KeycloakAuthContext.Provider value={state}>
+		<KeycloakAuthContext.Provider value={authValue}>
 			{props.children}
 		</KeycloakAuthContext.Provider>
 	);
