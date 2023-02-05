@@ -124,6 +124,10 @@ describe('authorization', () => {
 		]);
 	});
 
+	it('handles a failed authentication and clears the token from localStorage', async () => {
+		throw new Error();
+	});
+
 	it('handles a successful authorization, and a successful refresh', async () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED, TOKEN_PARSED);
 		const [authorize, logout] = createKeycloakAuthorization({
