@@ -244,7 +244,15 @@ describe('authorization', () => {
 	});
 
 	it('handles a successful authentication but a failed refresh because client role removed', async () => {
-		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		const newToken: KeycloakTokenParsed = {
+			...TOKEN_PARSED,
+			resource_access: {
+				[CLIENT_ID]: {
+					roles: ['abc']
+				}
+			}
+		};
+		MockKeycloak.setAuthResults(TOKEN_PARSED, newToken);
 		const authorize = createKeycloakAuthorization({
 			realm: REALM,
 			authServerUrl: AUTH_SERVER_URL,
