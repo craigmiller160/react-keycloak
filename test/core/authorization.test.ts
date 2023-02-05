@@ -265,6 +265,15 @@ describe('authorization', () => {
 				error: ACCESS_DENIED_ERROR
 			}
 		]);
+		throw new Error('Must check for redirect having occurred');
+	});
+
+	it('handles a failed authorization because missing a client role, but with redirect disabled', async () => {
+		throw new Error();
+	});
+
+	it('handles a failed authorization because missing a client role, but with custom redirect url', async () => {
+		throw new Error();
 	});
 
 	it('handles a successful authorization but a failed refresh because realm role removed', async () => {

@@ -138,6 +138,16 @@ describe('KeycloakAuthProvider', () => {
 		expect(screen.getByText(/Token:/)).toHaveTextContent('false');
 		expect(screen.getByText(/Token Parsed/)).toHaveTextContent('false');
 		expect(screen.getByText(/Error/)).toHaveTextContent('true');
+
+		throw new Error('Must check for redirect having occurred');
+	});
+
+	it('handles a failed authorization due to required roles, but with redirect disabled', async () => {
+		throw new Error();
+	});
+
+	it('handles a failed authorization due to required roles, but with custom redirect url', async () => {
+		throw new Error();
 	});
 
 	it('handles a failed authentication', async () => {
