@@ -1,26 +1,26 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { render, waitFor, screen } from '@testing-library/react';
-import { KeycloakAuthContext, KeycloakAuthProvider } from '../../src';
-import { DEFAULT_TOKEN, MockKeycloak } from '../mocks/MockKeycloak';
-import { useContext } from 'react';
-import { RequiredRoles } from '../../src/react/KeycloakAuthProvider';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import {
-	ACCESS_TOKEN_EXP,
+	KeycloakAuthContext,
+	KeycloakAuthProvider,
+	RequiredRoles
+} from '../../src';
+import { MockKeycloak } from '../mocks/MockKeycloak';
+import { useContext } from 'react';
+import {
 	AUTH_SERVER_URL,
-	CLIENT_ACCESS_ROLE,
 	CLIENT_ID,
 	LOCAL_STORAGE_KEY,
 	REALM,
-	REALM_ACCESS_ROLE,
+	TOKEN,
 	TOKEN_PARSED
 } from '../testutils/data';
 
 const KeycloakRenderer = () => {
-	const { isAuthorized, authStatus } = useContext(KeycloakAuthContext);
+	const { status } = useContext(KeycloakAuthContext);
 	return (
 		<div>
-			<p>Is Authorized: {isAuthorized ? 'true' : 'false'}</p>
-			<p>Auth Status: {authStatus}</p>
+			<p>Auth Status: {status}</p>
 		</div>
 	);
 };
@@ -31,7 +31,6 @@ const doRender = (requiredRoles?: Partial<RequiredRoles>) =>
 			realm={REALM}
 			authServerUrl={AUTH_SERVER_URL}
 			clientId={CLIENT_ID}
-			bearerTokenLocalStorageKey={LOCAL_STORAGE_KEY}
 			requiredRoles={requiredRoles}
 		>
 			<KeycloakRenderer />
@@ -44,7 +43,7 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a successful authentication', async () => {
-		MockKeycloak.setAuthResults(true, TOKEN_PARSED);
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
 		doRender();
 		await waitFor(() =>
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
@@ -54,7 +53,7 @@ describe('KeycloakAuthProvider', () => {
 			realm: REALM,
 			clientId: CLIENT_ID
 		});
-		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toEqual(DEFAULT_TOKEN);
+		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toEqual(TOKEN);
 		await waitFor(() =>
 			expect(screen.getByText(/Is Authorized/)).toHaveTextContent('true')
 		);
@@ -62,7 +61,7 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a failed authentication', async () => {
-		MockKeycloak.setAuthResults(false);
+		MockKeycloak.setAuthResults(null);
 		doRender();
 		await waitFor(() =>
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
