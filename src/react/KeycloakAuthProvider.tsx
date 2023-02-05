@@ -1,24 +1,16 @@
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { KeycloakAuthContext } from './KeycloakAuthContext';
 import type { KeycloakAuth } from './types';
-import { AuthorizeWithKeycloak, RequiredRoles } from '../core/types';
+import { AuthorizeWithKeycloak, KeycloakAuthConfig } from '../core/types';
 import { createKeycloakAuthorization } from '../core';
-
-type Props = {
-	readonly realm: string;
-	readonly authServerUrl?: string;
-	readonly clientId: string;
-	readonly localStorageKey?: string;
-	readonly requiredRoles?: Partial<RequiredRoles>;
-	readonly doAccessDeniedRedirect?: boolean;
-	readonly accessDeniedUrl?: string;
-};
 
 type ProviderState = KeycloakAuth & {
 	readonly authorize: AuthorizeWithKeycloak;
 };
 
-export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
+export const KeycloakAuthProvider = (
+	props: PropsWithChildren<KeycloakAuthConfig>
+) => {
 	const [state, setState] = useState<ProviderState>({
 		status: 'pre-auth',
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -29,15 +21,7 @@ export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
 
 	useEffect(() => {
 		if (state.status === 'pre-auth') {
-			const [authorize, logout] = createKeycloakAuthorization({
-				realm: props.realm,
-				clientId: props.clientId,
-				authServerUrl: props.authServerUrl,
-				requiredRoles: props.requiredRoles,
-				localStorageKey: props.localStorageKey,
-				doAccessDeniedRedirect: props.doAccessDeniedRedirect,
-				accessDeniedUrl: props.accessDeniedUrl
-			});
+			const [authorize, logout] = createKeycloakAuthorization(props);
 			setState((prevState) => ({
 				...prevState,
 				status: 'authorizing',
@@ -65,16 +49,7 @@ export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
 					}))
 			);
 		}
-	}, [
-		state,
-		props.realm,
-		props.clientId,
-		props.authServerUrl,
-		props.requiredRoles,
-		props.localStorageKey,
-		props.doAccessDeniedRedirect,
-		props.accessDeniedUrl
-	]);
+	}, [state, props]);
 
 	return (
 		<KeycloakAuthContext.Provider value={state}>
