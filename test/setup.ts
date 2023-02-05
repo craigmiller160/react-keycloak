@@ -17,6 +17,10 @@ vi.mock('../src/utils/newDate', () => {
 	};
 });
 
+vi.mock('../src/utils/navigate', () => ({
+	navigate: vi.fn()
+}));
+
 vi.mock('keycloak-js', async () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const mock = (await vi.importActual('./mocks/MockKeycloak')) as any;
