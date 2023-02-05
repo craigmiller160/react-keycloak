@@ -25,13 +25,14 @@ export class MockKeycloak {
 
 	token?: string;
 	tokenParsed?: KeycloakTokenParsed;
-	private currentAuthResult = 0;
+	private currentAuthResult = -1;
 	constructor(config: KeycloakConfig) {
 		MockKeycloak.lastConfig = config;
 	}
 
 	init(options: KeycloakInitOptions): Promise<boolean> {
 		MockKeycloak.lastInit = options;
+		this.currentAuthResult++;
 		if (MockKeycloak.authResults[this.currentAuthResult] === undefined) {
 			throw new Error('Must initialize the static auth results');
 		}
@@ -46,8 +47,6 @@ export class MockKeycloak {
 			this.tokenParsed = undefined;
 		}
 
-		this.currentAuthResult++;
-
 		if (authSuccess && this.onAuthSuccess) {
 			this.onAuthSuccess();
 		}
@@ -61,6 +60,7 @@ export class MockKeycloak {
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	updateToken(minValidity: number): Promise<boolean> {
+		this.currentAuthResult++;
 		if (MockKeycloak.authResults[this.currentAuthResult] === undefined) {
 			throw new Error(
 				'Must initialize enough static auth results for all refreshes'
@@ -76,8 +76,6 @@ export class MockKeycloak {
 			this.token = undefined;
 			this.tokenParsed = undefined;
 		}
-
-		this.currentAuthResult++;
 
 		if (authSuccess && this.onAuthRefreshSuccess) {
 			this.onAuthRefreshSuccess();

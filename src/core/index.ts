@@ -43,6 +43,7 @@ export const createKeycloakAuthorization = (
 					error: 'Access Denied',
 					error_description: 'Your access to this app is denied'
 				});
+				return;
 			}
 
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
