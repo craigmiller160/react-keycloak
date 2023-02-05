@@ -18,7 +18,7 @@ import { navigate } from '../utils/navigate';
 
 const hasRequiredRoles = (
 	keycloak: Keycloak,
-	requiredRoles?: Partial<RequiredRoles>
+	requiredRoles?: RequiredRoles
 ): boolean => {
 	const hasRequiredRealmRoles =
 		(requiredRoles?.realm ?? []).filter(

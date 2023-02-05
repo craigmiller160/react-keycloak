@@ -33,7 +33,7 @@ const KeycloakRenderer = () => {
 };
 
 type RenderConfig = {
-	readonly requiredRoles?: Partial<RequiredRoles>;
+	readonly requiredRoles?: RequiredRoles;
 	readonly localStorageKey?: string;
 	readonly doAccessDeniedRedirect?: boolean;
 	readonly accessDeniedUrl?: string;

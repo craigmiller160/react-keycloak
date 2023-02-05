@@ -1,8 +1,8 @@
 import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
 
 export type RequiredRoles = {
-	readonly realm: ReadonlyArray<string>;
-	readonly client: Record<string, ReadonlyArray<string>>;
+	readonly realm?: ReadonlyArray<string>;
+	readonly client?: Record<string, ReadonlyArray<string>>;
 };
 
 export type KeycloakAuthConfig = {
@@ -10,7 +10,7 @@ export type KeycloakAuthConfig = {
 	readonly authServerUrl?: string;
 	readonly clientId: string;
 	readonly localStorageKey?: string;
-	readonly requiredRoles?: Partial<RequiredRoles>;
+	readonly requiredRoles?: RequiredRoles;
 	readonly doAccessDeniedRedirect?: boolean;
 	readonly accessDeniedUrl?: string;
 };
