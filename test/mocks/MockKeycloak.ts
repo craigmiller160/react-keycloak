@@ -4,7 +4,7 @@ import type {
 	KeycloakInitOptions,
 	KeycloakTokenParsed
 } from 'keycloak-js';
-import {TOKEN, TOKEN_PARSED, UNAUTHORIZED_ERROR} from '../testutils/data';
+import { TOKEN, TOKEN_PARSED, UNAUTHORIZED_ERROR } from '../testutils/data';
 
 export class MockKeycloak {
 	static lastConfig?: KeycloakConfig = undefined;
@@ -100,4 +100,26 @@ export class MockKeycloak {
 	onAuthRefreshSuccess?: () => void;
 
 	onAuthRefreshError?: (error: KeycloakError) => void;
+
+	hasRealmRole(role: string): boolean {
+		if (MockKeycloak.authResults[this.currentAuthResult] != null) {
+			return (
+				MockKeycloak.authResults[
+					this.currentAuthResult
+				]?.realm_access?.roles?.includes(role) ?? false
+			);
+		}
+		return false;
+	}
+
+	hasResourceRole(role: string, client: string): boolean {
+		if (MockKeycloak.authResults[this.currentAuthResult] != null) {
+			return (
+				MockKeycloak.authResults[
+					this.currentAuthResult
+				]?.resource_access?.[client]?.roles?.includes(role) ?? false
+			);
+		}
+		return false;
+	}
 }
