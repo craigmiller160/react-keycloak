@@ -20,9 +20,9 @@ const KeycloakRenderer = () => {
 	return (
 		<div>
 			<p>Auth Status: {status}</p>
-			<p>Token: {token !== undefined}</p>
-			<p>Token Parsed: {tokenParsed !== undefined}</p>
-			<p>Error: {error !== undefined}</p>
+			<p>Token: {`${token !== undefined}`}</p>
+			<p>Token Parsed: {`${tokenParsed !== undefined}`}</p>
+			<p>Error: {`${error !== undefined}`}</p>
 		</div>
 	);
 };
@@ -56,7 +56,7 @@ describe('KeycloakAuthProvider', () => {
 			clientId: CLIENT_ID
 		});
 		expect(screen.getByText(/Auth Status/)).toHaveTextContent('authorized');
-		expect(screen.getByText(/Token/)).toHaveTextContent('true');
+		expect(screen.getByText(/Token:/)).toHaveTextContent('true');
 		expect(screen.getByText(/Token Parsed/)).toHaveTextContent('true');
 		expect(screen.getByText(/Error/)).toHaveTextContent('false');
 		// expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toEqual(TOKEN);
@@ -78,7 +78,7 @@ describe('KeycloakAuthProvider', () => {
 				'unauthorized'
 			)
 		);
-		expect(screen.getByText(/Token/)).toHaveTextContent('false');
+		expect(screen.getByText(/Token:/)).toHaveTextContent('false');
 		expect(screen.getByText(/Token Parsed/)).toHaveTextContent('false');
 		expect(screen.getByText(/Error/)).toHaveTextContent('true');
 		// expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toBeNull();
