@@ -1,4 +1,4 @@
-import { beforeEach, describe, it, vi, afterEach, expect } from 'vitest';
+import { beforeEach, describe, it, vi, afterEach, expect, Mock } from 'vitest';
 import {
 	ACCESS_DENIED_ERROR,
 	ACCESS_TOKEN_EXP,
@@ -18,6 +18,7 @@ import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
 import { createKeycloakAuthorization } from '../../src/core';
 import { MockKeycloak } from '../mocks/MockKeycloak';
 import { AUTH_SERVER_URL } from '../../src/core/constants';
+import { navigate } from '../../src/utils/navigate';
 
 const advancePastRefresh = () =>
 	vi.advanceTimersByTime((ACCESS_TOKEN_EXP - 30) * 1000 + 10);
@@ -27,6 +28,8 @@ type Result = {
 	readonly tokenParsed: KeycloakTokenParsed;
 	readonly error: KeycloakError;
 };
+
+const navigateMock = navigate as Mock<[string], void>;
 
 const promisify =
 	(waitForResultCount: number) =>
@@ -62,6 +65,7 @@ describe('authorization', () => {
 	beforeEach(() => {
 		vi.useFakeTimers();
 		localStorage.clear();
+		navigateMock.mockClear();
 	});
 
 	afterEach(() => {
