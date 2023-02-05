@@ -60,10 +60,12 @@ const promisify =
 describe('authorization', () => {
 	beforeEach(() => {
 		vi.useFakeTimers();
+		localStorage.clear();
 	});
 
 	afterEach(() => {
 		vi.useRealTimers();
+		localStorage.clear();
 	});
 
 	it('handles a successful authorization', async () => {

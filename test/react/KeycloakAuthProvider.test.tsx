@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import {
 	KeycloakAuthContext,
@@ -41,6 +41,10 @@ const doRender = (requiredRoles?: Partial<RequiredRoles>) =>
 
 describe('KeycloakAuthProvider', () => {
 	beforeEach(() => {
+		localStorage.clear();
+	});
+
+	afterEach(() => {
 		localStorage.clear();
 	});
 
