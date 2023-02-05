@@ -125,7 +125,23 @@ describe('authorization', () => {
 	});
 
 	it('handles a failed authentication and clears the token from localStorage', async () => {
-		throw new Error();
+		localStorage.setItem(LOCAL_STORAGE_KEY, 'foobar');
+		MockKeycloak.setAuthResults(null);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			localStorageKey: LOCAL_STORAGE_KEY
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const results = await promisify(1)(authorize);
+		expect(results).toEqual([
+			{
+				error: UNAUTHORIZED_ERROR
+			}
+		]);
+
+		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toBeNull();
 	});
 
 	it('handles a successful authorization, and a successful refresh', async () => {
