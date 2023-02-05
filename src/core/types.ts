@@ -2,7 +2,7 @@ import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
 
 export type RequiredRoles = {
 	readonly realm: ReadonlyArray<string>;
-	readonly client: ReadonlyArray<string>;
+	readonly client: Record<string, ReadonlyArray<string>>;
 };
 
 export type KeycloakAuthConfig = {
