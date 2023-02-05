@@ -1,5 +1,6 @@
 import { AuthorizeWithKeycloak, KeycloakAuthConfig } from './types';
 import Keycloak from 'keycloak-js';
+import { newDate } from '../utils/newDate';
 
 export const createKeycloakAuthorization = (
 	config: KeycloakAuthConfig
@@ -14,7 +15,10 @@ export const createKeycloakAuthorization = (
 			// TODO check for roles
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			onSuccess(keycloak.token!, keycloak.tokenParsed!);
-			// TODO trigger the refresh
+			const current = newDate().getTime();
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			const exp = keycloak.tokenParsed!.exp! * 1000;
+			setTimeout(() => keycloak.updateToken(40), exp - current - 30_000);
 		};
 
 		keycloak.onAuthSuccess = handleOnSuccess;
