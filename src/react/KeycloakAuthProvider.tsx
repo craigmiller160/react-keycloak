@@ -1,5 +1,6 @@
 import { PropsWithChildren, useEffect, useState } from 'react';
-import { KeycloakAuth, KeycloakAuthContext } from './KeycloakAuthContext';
+import { KeycloakAuthContext } from './KeycloakAuthContext';
+import type { KeycloakAuth } from './types';
 import { AuthorizeWithKeycloak, RequiredRoles } from '../core/types';
 import { createKeycloakAuthorization } from '../core';
 
@@ -10,12 +11,12 @@ type Props = {
 	readonly requiredRoles?: Partial<RequiredRoles>;
 };
 
-type State = KeycloakAuth & {
+type ProviderState = KeycloakAuth & {
 	readonly authorize: AuthorizeWithKeycloak;
 };
 
 export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
-	const [state, setState] = useState<State>({
+	const [state, setState] = useState<ProviderState>({
 		status: 'pre-auth',
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		logout: () => {},
