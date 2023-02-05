@@ -7,6 +7,7 @@ import {
 	CLIENT_ID,
 	REALM,
 	REALM_ACCESS_ROLE,
+	REFRESH_ERROR,
 	TOKEN,
 	TOKEN_PARSED,
 	UNAUTHORIZED_ERROR
@@ -133,7 +134,7 @@ describe('authorization', () => {
 				tokenParsed: TOKEN_PARSED
 			},
 			{
-				error: UNAUTHORIZED_ERROR
+				error: REFRESH_ERROR
 			}
 		]);
 	});
