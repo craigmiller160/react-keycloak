@@ -17,7 +17,7 @@ import { AuthorizeWithKeycloak } from '../../src/core/types';
 import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
 import { createKeycloakAuthorization } from '../../src/core';
 import { MockKeycloak } from '../mocks/MockKeycloak';
-import { AUTH_SERVER_URL } from '../../src/core/constants';
+import { ACCESS_DENIED_URL, AUTH_SERVER_URL } from '../../src/core/constants';
 import { navigate } from '../../src/utils/navigate';
 
 const advancePastRefresh = () =>
@@ -269,15 +269,53 @@ describe('authorization', () => {
 				error: ACCESS_DENIED_ERROR
 			}
 		]);
-		throw new Error('Must check for redirect having occurred');
+
+		expect(navigateMock).toHaveBeenCalledWith(ACCESS_DENIED_URL);
 	});
 
 	it('handles a failed authorization because missing a client role, but with redirect disabled', async () => {
-		throw new Error();
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			doAccessDeniedRedirect: false,
+			requiredRoles: {
+				client: ['abc']
+			}
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const results = await promisify(1)(authorize);
+		expect(results).toEqual([
+			{
+				error: ACCESS_DENIED_ERROR
+			}
+		]);
+
+		expect(navigateMock).not.toHaveBeenCalled();
 	});
 
 	it('handles a failed authorization because missing a client role, but with custom redirect url', async () => {
-		throw new Error();
+		const accessDeniedUrl = 'https://foobar.com';
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			accessDeniedUrl,
+			requiredRoles: {
+				client: ['abc']
+			}
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const results = await promisify(1)(authorize);
+		expect(results).toEqual([
+			{
+				error: ACCESS_DENIED_ERROR
+			}
+		]);
+
+		expect(navigateMock).toHaveBeenCalledWith(accessDeniedUrl);
 	});
 
 	it('handles a successful authorization but a failed refresh because realm role removed', async () => {
