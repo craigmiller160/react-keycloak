@@ -10,9 +10,11 @@ import Keycloak, { KeycloakError } from 'keycloak-js';
 import { newDate } from '../utils/newDate';
 import {
 	ACCESS_DENIED_ERROR,
+	ACCESS_DENIED_URL,
 	AUTH_SERVER_URL,
 	REFRESH_ERROR
 } from './constants';
+import { navigate } from '../utils/navigate';
 
 const hasRequiredRoles = (
 	keycloak: Keycloak,
@@ -66,6 +68,14 @@ const createHandleOnFailure =
 		if (config.localStorageKey) {
 			localStorage.removeItem(config.localStorageKey);
 		}
+
+		const doAccessDeniedRedirect = config.doAccessDeniedRedirect ?? true;
+		const accessDeniedUrl = config.accessDeniedUrl ?? ACCESS_DENIED_URL;
+
+		if (doAccessDeniedRedirect) {
+			navigate(accessDeniedUrl);
+		}
+
 		onFailure(error);
 	};
 
