@@ -12,10 +12,11 @@ const hasRequiredRoles = (
 	requiredRoles?: Partial<RequiredRoles>
 ): boolean => {
 	const hasRequiredRealmRoles =
-		requiredRoles?.realm?.filter((role) => !keycloak.hasRealmRole(role))
-			.length === 0;
+		(requiredRoles?.realm ?? []).filter(
+			(role) => !keycloak.hasRealmRole(role)
+		).length === 0;
 	const hasRequiredClientRoles =
-		requiredRoles?.client?.filter(
+		(requiredRoles?.client ?? []).filter(
 			(role) => !keycloak.hasResourceRole(role, clientId)
 		).length === 0;
 	return hasRequiredRealmRoles && hasRequiredClientRoles;
