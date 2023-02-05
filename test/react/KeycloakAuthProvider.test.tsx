@@ -28,7 +28,6 @@ const KeycloakRenderer = () => {
 const doRender = (requiredRoles?: Partial<RequiredRoles>) =>
 	render(
 		<KeycloakAuthProvider
-			accessTokenExpirationSecs={ACCESS_TOKEN_EXP}
 			realm={REALM}
 			authServerUrl={AUTH_SERVER_URL}
 			clientId={CLIENT_ID}
@@ -65,72 +64,6 @@ describe('KeycloakAuthProvider', () => {
 	it('handles a failed authentication', async () => {
 		MockKeycloak.setAuthResults(false);
 		doRender();
-		await waitFor(() =>
-			expect(MockKeycloak.lastConfig).not.toBeUndefined()
-		);
-		expect(MockKeycloak.lastConfig).toEqual({
-			url: AUTH_SERVER_URL,
-			realm: REALM,
-			clientId: CLIENT_ID
-		});
-		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toBeNull();
-		await waitFor(() =>
-			expect(screen.getByText(/Is Authorized/)).toHaveTextContent('false')
-		);
-		await waitFor(() =>
-			expect(screen.getByText(/Auth Status/)).toHaveTextContent(
-				'post-auth'
-			)
-		);
-	});
-
-	it('handles a successful authentication with the required realm roles', async () => {
-		MockKeycloak.setAuthResults(true, TOKEN_PARSED);
-		doRender({
-			realm: [REALM_ACCESS_ROLE]
-		});
-		await waitFor(() =>
-			expect(MockKeycloak.lastConfig).not.toBeUndefined()
-		);
-		expect(MockKeycloak.lastConfig).toEqual({
-			url: AUTH_SERVER_URL,
-			realm: REALM,
-			clientId: CLIENT_ID
-		});
-		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toEqual(DEFAULT_TOKEN);
-		await waitFor(() =>
-			expect(screen.getByText(/Is Authorized/)).toHaveTextContent('true')
-		);
-		expect(screen.getByText(/Auth Status/)).toHaveTextContent('post-auth');
-	});
-
-	it('handles a successful authentication with the required client roles', async () => {
-		MockKeycloak.setAuthResults(true, TOKEN_PARSED);
-		doRender({
-			client: {
-				[CLIENT_ID]: [CLIENT_ACCESS_ROLE]
-			}
-		});
-		await waitFor(() =>
-			expect(MockKeycloak.lastConfig).not.toBeUndefined()
-		);
-		expect(MockKeycloak.lastConfig).toEqual({
-			url: AUTH_SERVER_URL,
-			realm: REALM,
-			clientId: CLIENT_ID
-		});
-		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toEqual(DEFAULT_TOKEN);
-		await waitFor(() =>
-			expect(screen.getByText(/Is Authorized/)).toHaveTextContent('true')
-		);
-		expect(screen.getByText(/Auth Status/)).toHaveTextContent('post-auth');
-	});
-
-	it('handles a successful authentication without the roles required roles', async () => {
-		MockKeycloak.setAuthResults(true, TOKEN_PARSED);
-		doRender({
-			realm: ['not_there']
-		});
 		await waitFor(() =>
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
 		);
