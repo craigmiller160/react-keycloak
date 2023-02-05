@@ -77,7 +77,9 @@ describe('KeycloakAuthProvider', () => {
 
 	it('handles a successful authentication with token going to localStorage', async () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
-		doRender();
+		doRender({
+			localStorageKey: LOCAL_STORAGE_KEY
+		});
 		await waitFor(() =>
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
 		);

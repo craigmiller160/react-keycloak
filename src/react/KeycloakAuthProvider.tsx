@@ -31,7 +31,8 @@ export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
 				realm: props.realm,
 				clientId: props.clientId,
 				authServerUrl: props.authServerUrl,
-				requiredRoles: props.requiredRoles
+				requiredRoles: props.requiredRoles,
+				localStorageKey: props.localStorageKey
 			});
 			setState((prevState) => ({
 				...prevState,
@@ -65,7 +66,8 @@ export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
 		props.realm,
 		props.clientId,
 		props.authServerUrl,
-		props.requiredRoles
+		props.requiredRoles,
+		props.localStorageKey
 	]);
 
 	return (
