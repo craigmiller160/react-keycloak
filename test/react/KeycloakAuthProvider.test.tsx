@@ -96,6 +96,14 @@ describe('KeycloakAuthProvider', () => {
 		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toEqual(TOKEN);
 	});
 
+	it('handles a successful authentication with required roles', async () => {
+		throw new Error();
+	});
+
+	it('handles a failed authentication due to required roles', async () => {
+		throw new Error();
+	});
+
 	it('handles a failed authentication', async () => {
 		MockKeycloak.setAuthResults(null);
 		doRender();
