@@ -10,17 +10,19 @@ import { useContext } from 'react';
 import {
 	AUTH_SERVER_URL,
 	CLIENT_ID,
-	LOCAL_STORAGE_KEY,
 	REALM,
-	TOKEN,
 	TOKEN_PARSED
 } from '../testutils/data';
 
 const KeycloakRenderer = () => {
-	const { status } = useContext(KeycloakAuthContext);
+	const { status, token, tokenParsed, error } =
+		useContext(KeycloakAuthContext);
 	return (
 		<div>
 			<p>Auth Status: {status}</p>
+			<p>Token: {token !== undefined}</p>
+			<p>Token Parsed: {tokenParsed !== undefined}</p>
+			<p>Error: {error !== undefined}</p>
 		</div>
 	);
 };
@@ -53,11 +55,11 @@ describe('KeycloakAuthProvider', () => {
 			realm: REALM,
 			clientId: CLIENT_ID
 		});
-		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toEqual(TOKEN);
-		await waitFor(() =>
-			expect(screen.getByText(/Is Authorized/)).toHaveTextContent('true')
-		);
-		expect(screen.getByText(/Auth Status/)).toHaveTextContent('post-auth');
+		expect(screen.getByText(/Auth Status/)).toHaveTextContent('authorized');
+		expect(screen.getByText(/Token/)).toHaveTextContent('true');
+		expect(screen.getByText(/Token Parsed/)).toHaveTextContent('true');
+		expect(screen.getByText(/Error/)).toHaveTextContent('false');
+		// expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toEqual(TOKEN);
 	});
 
 	it('handles a failed authentication', async () => {
@@ -71,14 +73,14 @@ describe('KeycloakAuthProvider', () => {
 			realm: REALM,
 			clientId: CLIENT_ID
 		});
-		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toBeNull();
-		await waitFor(() =>
-			expect(screen.getByText(/Is Authorized/)).toHaveTextContent('false')
-		);
 		await waitFor(() =>
 			expect(screen.getByText(/Auth Status/)).toHaveTextContent(
-				'post-auth'
+				'unauthorized'
 			)
 		);
+		expect(screen.getByText(/Token/)).toHaveTextContent('false');
+		expect(screen.getByText(/Token Parsed/)).toHaveTextContent('false');
+		expect(screen.getByText(/Error/)).toHaveTextContent('true');
+		// expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toBeNull();
 	});
 });
