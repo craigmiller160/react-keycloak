@@ -10,7 +10,8 @@ import {
 	REFRESH_ERROR,
 	TOKEN,
 	TOKEN_PARSED,
-	UNAUTHORIZED_ERROR
+	UNAUTHORIZED_ERROR,
+	LOCAL_STORAGE_KEY
 } from '../testutils/data';
 import { AuthorizeWithKeycloak } from '../../src/core/types';
 import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
@@ -83,6 +84,28 @@ describe('authorization', () => {
 				tokenParsed: TOKEN_PARSED
 			}
 		]);
+
+		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toBeNull();
+	});
+
+	it('handles a successful authorization and stores the token in localStorage', async () => {
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			localStorageKey: LOCAL_STORAGE_KEY
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const results = await promisify(1)(authorize);
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			}
+		]);
+
+		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toEqual(TOKEN);
 	});
 
 	it('handles a failed authorization', async () => {
