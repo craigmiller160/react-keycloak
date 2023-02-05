@@ -2,6 +2,8 @@ import {
 	AuthorizeWithKeycloak,
 	CreateKeycloakAuthorization,
 	KeycloakAuthConfig,
+	KeycloakAuthFailedHandler,
+	KeycloakAuthSuccessHandler,
 	RequiredRoles
 } from './types';
 import Keycloak, { KeycloakError } from 'keycloak-js';
@@ -24,6 +26,48 @@ const hasRequiredRoles = (
 	return hasRequiredRealmRoles && hasRequiredClientRoles;
 };
 
+const createHandleOnSuccess =
+	(keycloak: Keycloak, config: KeycloakAuthConfig) =>
+	(
+		onSuccess: KeycloakAuthSuccessHandler,
+		onFailure: KeycloakAuthFailedHandler
+	) =>
+	() => {
+		if (
+			!hasRequiredRoles(keycloak, config.clientId, config.requiredRoles)
+		) {
+			onFailure({
+				error: 'Access Denied',
+				error_description: 'Your access to this app is denied'
+			});
+			return;
+		}
+
+		if (config.localStorageKey) {
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			localStorage.setItem(config.localStorageKey, keycloak.token!);
+		}
+
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		onSuccess(keycloak.token!, keycloak.tokenParsed!);
+
+		const current = newDate().getTime();
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		const exp = keycloak.tokenParsed!.exp! * 1000;
+
+		setTimeout(() => keycloak.updateToken(40), exp - current - 30_000);
+	};
+
+const createHandleOnFailure =
+	(config: KeycloakAuthConfig) =>
+	(onFailure: KeycloakAuthFailedHandler) =>
+	(error: KeycloakError) => {
+		if (config.localStorageKey) {
+			localStorage.removeItem(config.localStorageKey);
+		}
+		onFailure(error);
+	};
+
 export const createKeycloakAuthorization: CreateKeycloakAuthorization = (
 	config: KeycloakAuthConfig
 ) => {
@@ -32,49 +76,14 @@ export const createKeycloakAuthorization: CreateKeycloakAuthorization = (
 		realm: config.realm,
 		clientId: config.clientId
 	});
+	const handleOnFailure = createHandleOnFailure(config);
+	const handleOnSuccess = createHandleOnSuccess(keycloak, config);
 	const authorize: AuthorizeWithKeycloak = (onSuccess, onFailure) => {
-		const handleOnSuccess = () => {
-			if (
-				!hasRequiredRoles(
-					keycloak,
-					config.clientId,
-					config.requiredRoles
-				)
-			) {
-				onFailure({
-					error: 'Access Denied',
-					error_description: 'Your access to this app is denied'
-				});
-				return;
-			}
-
-			if (config.localStorageKey) {
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-				localStorage.setItem(config.localStorageKey, keycloak.token!);
-			}
-
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			onSuccess(keycloak.token!, keycloak.tokenParsed!);
-
-			const current = newDate().getTime();
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			const exp = keycloak.tokenParsed!.exp! * 1000;
-
-			setTimeout(() => keycloak.updateToken(40), exp - current - 30_000);
-		};
-
-		const handleOnFailure = (error: KeycloakError) => {
-			if (config.localStorageKey) {
-				localStorage.removeItem(config.localStorageKey);
-			}
-			onFailure(error);
-		};
-
-		keycloak.onAuthSuccess = handleOnSuccess;
-		keycloak.onAuthRefreshSuccess = handleOnSuccess;
-		keycloak.onAuthError = handleOnFailure;
+		keycloak.onAuthSuccess = handleOnSuccess(onSuccess, onFailure);
+		keycloak.onAuthRefreshSuccess = handleOnSuccess(onSuccess, onFailure);
+		keycloak.onAuthError = handleOnFailure(onFailure);
 		keycloak.onAuthRefreshError = () =>
-			handleOnFailure({
+			handleOnFailure(onFailure)({
 				error: 'Refresh Error',
 				error_description: 'Failed to refresh token'
 			});
