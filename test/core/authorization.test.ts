@@ -1,0 +1,287 @@
+import { beforeEach, describe, it, vi, afterEach, expect } from 'vitest';
+import {
+	ACCESS_DENIED_ERROR,
+	ACCESS_TOKEN_EXP,
+	AUTH_SERVER_URL,
+	CLIENT_ACCESS_ROLE,
+	CLIENT_ID,
+	REALM,
+	REALM_ACCESS_ROLE,
+	REFRESH_ERROR,
+	TOKEN,
+	TOKEN_PARSED,
+	UNAUTHORIZED_ERROR
+} from '../testutils/data';
+import { AuthorizeWithKeycloak } from '../../src/core/types';
+import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
+import { createKeycloakAuthorization } from '../../src/core';
+import { MockKeycloak } from '../mocks/MockKeycloak';
+
+const advancePastRefresh = () =>
+	vi.advanceTimersByTime((ACCESS_TOKEN_EXP - 30) * 1000 + 10);
+
+type Result = {
+	readonly token: string;
+	readonly tokenParsed: KeycloakTokenParsed;
+	readonly error: KeycloakError;
+};
+
+const promisify =
+	(waitForResultCount: number) =>
+	(
+		authorize: AuthorizeWithKeycloak
+	): Promise<ReadonlyArray<Partial<Result>>> =>
+		new Promise((resolve) => {
+			const results: Partial<Result>[] = [];
+			authorize(
+				(token, tokenParsed) => {
+					results.push({
+						token,
+						tokenParsed
+					});
+
+					if (results.length >= waitForResultCount) {
+						resolve(results);
+					}
+				},
+				(error) => {
+					results.push({
+						error
+					});
+
+					if (results.length >= waitForResultCount) {
+						resolve(results);
+					}
+				}
+			);
+		});
+
+describe('authorization', () => {
+	beforeEach(() => {
+		vi.useFakeTimers();
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	it('handles a successful authorization', async () => {
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const results = await promisify(1)(authorize);
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			}
+		]);
+	});
+
+	it('handles a failed authorization', async () => {
+		MockKeycloak.setAuthResults(null);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const results = await promisify(1)(authorize);
+		expect(results).toEqual([
+			{
+				error: UNAUTHORIZED_ERROR
+			}
+		]);
+	});
+
+	it('handles a successful authorization, and a successful refresh', async () => {
+		MockKeycloak.setAuthResults(TOKEN_PARSED, TOKEN_PARSED);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const promise = promisify(2)(authorize);
+		advancePastRefresh();
+		const results = await promise;
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			},
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			}
+		]);
+	});
+
+	it('handles a successful authorization, and a failed refresh', async () => {
+		MockKeycloak.setAuthResults(TOKEN_PARSED, null);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const promise = promisify(2)(authorize);
+		advancePastRefresh();
+		const results = await promise;
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			},
+			{
+				error: REFRESH_ERROR
+			}
+		]);
+	});
+
+	it('handles a successful authorization with the required realm roles', async () => {
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			requiredRoles: {
+				realm: [REALM_ACCESS_ROLE]
+			}
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const results = await promisify(1)(authorize);
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			}
+		]);
+	});
+
+	it('handles a successful authorization with the required client roles', async () => {
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			requiredRoles: {
+				client: [CLIENT_ACCESS_ROLE]
+			}
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const results = await promisify(1)(authorize);
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			}
+		]);
+	});
+
+	it('handles a failed authorization because missing a required realm role', async () => {
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			requiredRoles: {
+				realm: ['abc']
+			}
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const results = await promisify(1)(authorize);
+		expect(results).toEqual([
+			{
+				error: ACCESS_DENIED_ERROR
+			}
+		]);
+	});
+
+	it('handles a failed authorization because missing a required client role', async () => {
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			requiredRoles: {
+				client: ['abc']
+			}
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const results = await promisify(1)(authorize);
+		expect(results).toEqual([
+			{
+				error: ACCESS_DENIED_ERROR
+			}
+		]);
+	});
+
+	it('handles a successful authorization but a failed refresh because realm role removed', async () => {
+		const newToken: KeycloakTokenParsed = {
+			...TOKEN_PARSED,
+			realm_access: {
+				roles: ['abc']
+			}
+		};
+		MockKeycloak.setAuthResults(TOKEN_PARSED, newToken);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			requiredRoles: {
+				realm: [REALM_ACCESS_ROLE]
+			}
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const promise = promisify(2)(authorize);
+		advancePastRefresh();
+		const results = await promise;
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			},
+			{
+				error: ACCESS_DENIED_ERROR
+			}
+		]);
+	});
+
+	it('handles a successful authentication but a failed refresh because client role removed', async () => {
+		const newToken: KeycloakTokenParsed = {
+			...TOKEN_PARSED,
+			resource_access: {
+				[CLIENT_ID]: {
+					roles: ['abc']
+				}
+			}
+		};
+		MockKeycloak.setAuthResults(TOKEN_PARSED, newToken);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			requiredRoles: {
+				client: [CLIENT_ACCESS_ROLE]
+			}
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const promise = promisify(1)(authorize);
+		advancePastRefresh();
+		const results = await promise;
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			},
+			{
+				error: ACCESS_DENIED_ERROR
+			}
+		]);
+	});
+});
