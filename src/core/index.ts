@@ -79,8 +79,14 @@ export const createKeycloakAuthorization: CreateKeycloakAuthorization = (
 	const handleOnFailure = createHandleOnFailure(config);
 	const handleOnSuccess = createHandleOnSuccess(keycloak, config);
 	const authorize: AuthorizeWithKeycloak = (onSuccess, onFailure) => {
-		keycloak.onAuthSuccess = handleOnSuccess(onSuccess, onFailure);
-		keycloak.onAuthRefreshSuccess = handleOnSuccess(onSuccess, onFailure);
+		keycloak.onAuthSuccess = handleOnSuccess(
+			onSuccess,
+			handleOnFailure(onFailure)
+		);
+		keycloak.onAuthRefreshSuccess = handleOnSuccess(
+			onSuccess,
+			handleOnFailure(onFailure)
+		);
 		keycloak.onAuthError = handleOnFailure(onFailure);
 		keycloak.onAuthRefreshError = () =>
 			handleOnFailure(onFailure)({
