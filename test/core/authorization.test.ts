@@ -9,7 +9,8 @@ import {
 	TOKEN,
 	TOKEN_PARSED,
 	UNAUTHORIZED_ERROR,
-	LOCAL_STORAGE_KEY
+	LOCAL_STORAGE_KEY,
+	CLIENT_ACCESS_ID
 } from '../testutils/data';
 import { AuthorizeWithKeycloak } from '../../src/core/types';
 import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
@@ -223,7 +224,9 @@ describe('authorization', () => {
 			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
 			requiredRoles: {
-				client: [CLIENT_ACCESS_ROLE]
+				client: {
+					[CLIENT_ACCESS_ID]: [CLIENT_ACCESS_ROLE]
+				}
 			}
 		});
 		expect(logout).toBeInstanceOf(Function);
@@ -267,7 +270,9 @@ describe('authorization', () => {
 			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
 			requiredRoles: {
-				client: ['abc']
+				client: {
+					[CLIENT_ACCESS_ID]: ['abc']
+				}
 			}
 		});
 		expect(logout).toBeInstanceOf(Function);
@@ -290,7 +295,9 @@ describe('authorization', () => {
 			clientId: CLIENT_ID,
 			doAccessDeniedRedirect: false,
 			requiredRoles: {
-				client: ['abc']
+				client: {
+					[CLIENT_ACCESS_ID]: ['abc']
+				}
 			}
 		});
 		expect(logout).toBeInstanceOf(Function);
@@ -313,7 +320,9 @@ describe('authorization', () => {
 			clientId: CLIENT_ID,
 			accessDeniedUrl,
 			requiredRoles: {
-				client: ['abc']
+				client: {
+					[CLIENT_ACCESS_ID]: ['abc']
+				}
 			}
 		});
 		expect(logout).toBeInstanceOf(Function);
@@ -373,7 +382,9 @@ describe('authorization', () => {
 			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
 			requiredRoles: {
-				client: [CLIENT_ACCESS_ROLE]
+				client: {
+					[CLIENT_ACCESS_ID]: [CLIENT_ACCESS_ROLE]
+				}
 			}
 		});
 		expect(logout).toBeInstanceOf(Function);
