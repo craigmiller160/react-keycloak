@@ -17,7 +17,7 @@ import { createKeycloakAuthorization } from '../../src/core';
 import { MockKeycloak } from '../mocks/MockKeycloak';
 
 const advancePastRefresh = () =>
-	vi.advanceTimersByTime(ACCESS_TOKEN_EXP * 1000 + 10);
+	vi.advanceTimersByTime((ACCESS_TOKEN_EXP - 30) * 1000 + 10);
 
 type Result = {
 	readonly token: string;
@@ -96,6 +96,7 @@ describe('authorization', () => {
 	});
 
 	it('handles a successful authorization, and a successful refresh', async () => {
+		console.log('ADVANCE', (ACCESS_TOKEN_EXP - 30) * 1000 + 10);
 		MockKeycloak.setAuthResults(TOKEN_PARSED, TOKEN_PARSED);
 		const authorize = createKeycloakAuthorization({
 			realm: REALM,
