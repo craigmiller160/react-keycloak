@@ -233,12 +233,14 @@ describe('authorization', () => {
 		]);
 	});
 
-	it('handles a failed authorization because missing a required realm role', async () => {
+	it('handles a failed authorization because missing a required realm role, and clears localStorage', async () => {
+		localStorage.setItem(LOCAL_STORAGE_KEY, 'abc');
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
 			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
+			localStorageKey: LOCAL_STORAGE_KEY,
 			requiredRoles: {
 				realm: ['abc']
 			}
@@ -250,9 +252,12 @@ describe('authorization', () => {
 				error: ACCESS_DENIED_ERROR
 			}
 		]);
+
+		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toBeNull();
 	});
 
 	it('handles a failed authorization because missing a required client role', async () => {
+		localStorage.setItem(LOCAL_STORAGE_KEY, 'abc');
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
@@ -270,6 +275,7 @@ describe('authorization', () => {
 			}
 		]);
 
+		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toEqual('abc');
 		expect(navigateMock).toHaveBeenCalledWith(ACCESS_DENIED_URL);
 	});
 
