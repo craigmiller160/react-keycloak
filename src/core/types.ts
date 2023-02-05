@@ -1,5 +1,4 @@
 import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
-import { KeycloakAuthError } from '../errors/KeycloakAuthError';
 
 export type RequiredRoles = {
 	readonly realm: ReadonlyArray<string>;
@@ -24,6 +23,8 @@ export type AuthorizeWithKeycloak = (
 	onFailure: KeycloakAuthFailedHandler
 ) => void;
 
+export type Logout = () => void;
+
 export type CreateKeycloakAuthorization = (
 	config: KeycloakAuthConfig
-) => AuthorizeWithKeycloak;
+) => [AuthorizeWithKeycloak, Logout];

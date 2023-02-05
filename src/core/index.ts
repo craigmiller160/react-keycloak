@@ -1,5 +1,6 @@
 import {
 	AuthorizeWithKeycloak,
+	CreateKeycloakAuthorization,
 	KeycloakAuthConfig,
 	RequiredRoles
 } from './types';
@@ -22,15 +23,15 @@ const hasRequiredRoles = (
 	return hasRequiredRealmRoles && hasRequiredClientRoles;
 };
 
-export const createKeycloakAuthorization = (
+export const createKeycloakAuthorization: CreateKeycloakAuthorization = (
 	config: KeycloakAuthConfig
-): AuthorizeWithKeycloak => {
+) => {
 	const keycloak = new Keycloak({
 		url: config.authServerUrl,
 		realm: config.realm,
 		clientId: config.clientId
 	});
-	return (onSuccess, onFailure) => {
+	const authorize: AuthorizeWithKeycloak = (onSuccess, onFailure) => {
 		const handleOnSuccess = () => {
 			if (
 				!hasRequiredRoles(
@@ -67,4 +68,6 @@ export const createKeycloakAuthorization = (
 
 		keycloak.init({ onLoad: 'login-required' });
 	};
+
+	return [authorize, keycloak.logout];
 };
