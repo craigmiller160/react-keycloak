@@ -1,132 +1,74 @@
-import {
-	Dispatch,
-	PropsWithChildren,
-	SetStateAction,
-	useEffect,
-	useState
-} from 'react';
-import Keycloak from 'keycloak-js';
+import { PropsWithChildren, useEffect, useState } from 'react';
 import { KeycloakAuth, KeycloakAuthContext } from './KeycloakAuthContext';
-
-export type RequiredRoles = {
-	readonly realm: ReadonlyArray<string>;
-	readonly client: Record<string, ReadonlyArray<string>>;
-};
+import { AuthorizeWithKeycloak, RequiredRoles } from '../core/types';
+import { createKeycloakAuthorization } from '../core';
 
 type Props = {
-	readonly accessTokenExpirationSecs: number;
 	readonly realm: string;
 	readonly authServerUrl: string;
 	readonly clientId: string;
-	readonly bearerTokenLocalStorageKey: string;
 	readonly requiredRoles?: Partial<RequiredRoles>;
 };
 
-type KeycloakState = Omit<KeycloakAuth, 'logout'> & {
-	readonly keycloak: Keycloak;
-};
-
-const createKeycloak = (props: Props): Keycloak =>
-	new Keycloak({
-		url: props.authServerUrl,
-		realm: props.realm,
-		clientId: props.clientId
-	});
-
-const handleKeycloakResult =
-	(
-		keycloak: Keycloak,
-		bearerTokenLocalStorageKey: string,
-		updateAuth: Dispatch<SetStateAction<KeycloakState>>
-	) =>
-	(isSuccess: boolean) => {
-		if (isSuccess && keycloak.token) {
-			localStorage.setItem(bearerTokenLocalStorageKey, keycloak.token);
-		}
-		updateAuth((prevState) => ({
-			...prevState,
-			authStatus: 'post-auth',
-			isAuthorized: isSuccess
-		}));
-	};
-
-const initializeKeycloak = (
-	keycloak: Keycloak,
-	accessTokenExpirationSecs: number,
-	bearerTokenLocalStorageKey: string,
-	updateAuth: Dispatch<SetStateAction<KeycloakState>>
-): number => {
-	keycloak
-		.init({ onLoad: 'login-required' })
-		.then(
-			handleKeycloakResult(
-				keycloak,
-				bearerTokenLocalStorageKey,
-				updateAuth
-			)
-		)
-		.catch((ex) => console.error('Keycloak Authentication Error', ex));
-
-	const interval = window.setInterval(() => {
-		keycloak
-			.updateToken(accessTokenExpirationSecs - 70)
-			.then(
-				handleKeycloakResult(
-					keycloak,
-					bearerTokenLocalStorageKey,
-					updateAuth
-				)
-			)
-			.catch((ex) => console.error('Keycloak Refresh Error', ex));
-	}, (accessTokenExpirationSecs - 60) * 1000);
-
-	return interval;
+type State = KeycloakAuth & {
+	readonly authorize: AuthorizeWithKeycloak;
 };
 
 export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
-	const [state, setState] = useState<KeycloakState>({
+	const [state, setState] = useState<State>({
+		status: 'pre-auth',
 		isAuthorized: false,
-		authStatus: 'pre-auth',
-		keycloak: createKeycloak(props)
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+		logout: () => {},
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+		authorize: () => {}
 	});
+
 	useEffect(() => {
-		let interval: number | undefined = undefined;
-		if (state.authStatus === 'pre-auth') {
+		if (state.status === 'pre-auth') {
+			const [authorize, logout] = createKeycloakAuthorization({
+				realm: props.realm,
+				clientId: props.clientId,
+				authServerUrl: props.authServerUrl,
+				requiredRoles: props.requiredRoles
+			});
 			setState((prevState) => ({
 				...prevState,
-				authStatus: 'authorizing'
+				status: 'authorizing',
+				authorize,
+				logout
 			}));
-		} else if (state.authStatus === 'authorizing') {
-			interval = initializeKeycloak(
-				state.keycloak,
-				props.accessTokenExpirationSecs,
-				props.bearerTokenLocalStorageKey,
-				setState
+		} else if (state.status === 'authorizing') {
+			state.authorize(
+				(token, tokenParsed) =>
+					setState((prevState) => ({
+						...prevState,
+						status: 'post-auth',
+						isAuthorized: true,
+						token,
+						tokenParsed
+					})),
+				(error) =>
+					setState((prevState) => ({
+						...prevState,
+						status: 'post-auth',
+						isAuthorized: false,
+						token: undefined,
+						tokenParsed: undefined,
+						error
+					}))
 			);
 		}
-
-		return () => {
-			if (interval) {
-				clearInterval(interval);
-			}
-		};
 	}, [
-		setState,
-		state.authStatus,
-		props.accessTokenExpirationSecs,
-		props.bearerTokenLocalStorageKey,
-		state.keycloak
+		state,
+		props.realm,
+		props.clientId,
+		props.authServerUrl,
+		props.requiredRoles
 	]);
 
-	const authValue: KeycloakAuth = {
-		logout: state.keycloak.logout,
-		authStatus: state.authStatus,
-		isAuthorized: state.isAuthorized,
-		token: state.keycloak.tokenParsed
-	};
-
 	return (
-		<KeycloakAuthContext.Provider value={authValue}>
+		<KeycloakAuthContext.Provider value={state}>
 			{props.children}
 		</KeycloakAuthContext.Provider>
 	);
