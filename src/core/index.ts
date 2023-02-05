@@ -25,5 +25,7 @@ export const createKeycloakAuthorization = (
 				error: 'Refresh Error',
 				error_description: 'Failed to refresh token'
 			});
+
+		keycloak.init({ onLoad: 'login-required' });
 	};
 };
