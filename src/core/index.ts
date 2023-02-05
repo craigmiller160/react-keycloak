@@ -4,8 +4,9 @@ import {
 	KeycloakAuthConfig,
 	RequiredRoles
 } from './types';
-import Keycloak from 'keycloak-js';
+import Keycloak, { KeycloakError } from 'keycloak-js';
 import { newDate } from '../utils/newDate';
+import { AUTH_SERVER_URL } from './constants';
 
 const hasRequiredRoles = (
 	keycloak: Keycloak,
@@ -27,7 +28,7 @@ export const createKeycloakAuthorization: CreateKeycloakAuthorization = (
 	config: KeycloakAuthConfig
 ) => {
 	const keycloak = new Keycloak({
-		url: config.authServerUrl,
+		url: config.authServerUrl ?? AUTH_SERVER_URL,
 		realm: config.realm,
 		clientId: config.clientId
 	});
@@ -47,6 +48,11 @@ export const createKeycloakAuthorization: CreateKeycloakAuthorization = (
 				return;
 			}
 
+			if (config.localStorageKey) {
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+				localStorage.setItem(config.localStorageKey, keycloak.token!);
+			}
+
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			onSuccess(keycloak.token!, keycloak.tokenParsed!);
 
@@ -57,11 +63,18 @@ export const createKeycloakAuthorization: CreateKeycloakAuthorization = (
 			setTimeout(() => keycloak.updateToken(40), exp - current - 30_000);
 		};
 
+		const handleOnFailure = (error: KeycloakError) => {
+			if (config.localStorageKey) {
+				localStorage.removeItem(config.localStorageKey);
+			}
+			onFailure(error);
+		};
+
 		keycloak.onAuthSuccess = handleOnSuccess;
 		keycloak.onAuthRefreshSuccess = handleOnSuccess;
-		keycloak.onAuthError = onFailure;
+		keycloak.onAuthError = handleOnFailure;
 		keycloak.onAuthRefreshError = () =>
-			onFailure({
+			handleOnFailure({
 				error: 'Refresh Error',
 				error_description: 'Failed to refresh token'
 			});

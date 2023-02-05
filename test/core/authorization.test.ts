@@ -2,7 +2,7 @@ import { beforeEach, describe, it, vi, afterEach, expect } from 'vitest';
 import {
 	ACCESS_DENIED_ERROR,
 	ACCESS_TOKEN_EXP,
-	AUTH_SERVER_URL,
+	MOCK_AUTH_SERVER_URL,
 	CLIENT_ACCESS_ROLE,
 	CLIENT_ID,
 	REALM,
@@ -10,12 +10,14 @@ import {
 	REFRESH_ERROR,
 	TOKEN,
 	TOKEN_PARSED,
-	UNAUTHORIZED_ERROR
+	UNAUTHORIZED_ERROR,
+	LOCAL_STORAGE_KEY
 } from '../testutils/data';
 import { AuthorizeWithKeycloak } from '../../src/core/types';
 import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
 import { createKeycloakAuthorization } from '../../src/core';
 import { MockKeycloak } from '../mocks/MockKeycloak';
+import { AUTH_SERVER_URL } from '../../src/core/constants';
 
 const advancePastRefresh = () =>
 	vi.advanceTimersByTime((ACCESS_TOKEN_EXP - 30) * 1000 + 10);
@@ -59,17 +61,19 @@ const promisify =
 describe('authorization', () => {
 	beforeEach(() => {
 		vi.useFakeTimers();
+		localStorage.clear();
 	});
 
 	afterEach(() => {
 		vi.useRealTimers();
+		localStorage.clear();
 	});
 
 	it('handles a successful authorization', async () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID
 		});
 		expect(logout).toBeInstanceOf(Function);
@@ -80,13 +84,35 @@ describe('authorization', () => {
 				tokenParsed: TOKEN_PARSED
 			}
 		]);
+
+		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toBeNull();
+	});
+
+	it('handles a successful authorization and stores the token in localStorage', async () => {
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			localStorageKey: LOCAL_STORAGE_KEY
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const results = await promisify(1)(authorize);
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			}
+		]);
+
+		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toEqual(TOKEN);
 	});
 
 	it('handles a failed authorization', async () => {
 		MockKeycloak.setAuthResults(null);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID
 		});
 		expect(logout).toBeInstanceOf(Function);
@@ -98,11 +124,31 @@ describe('authorization', () => {
 		]);
 	});
 
+	it('handles a failed authentication and clears the token from localStorage', async () => {
+		localStorage.setItem(LOCAL_STORAGE_KEY, 'foobar');
+		MockKeycloak.setAuthResults(null);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			localStorageKey: LOCAL_STORAGE_KEY
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const results = await promisify(1)(authorize);
+		expect(results).toEqual([
+			{
+				error: UNAUTHORIZED_ERROR
+			}
+		]);
+
+		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toBeNull();
+	});
+
 	it('handles a successful authorization, and a successful refresh', async () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED, TOKEN_PARSED);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID
 		});
 		expect(logout).toBeInstanceOf(Function);
@@ -125,7 +171,7 @@ describe('authorization', () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED, null);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID
 		});
 		expect(logout).toBeInstanceOf(Function);
@@ -147,7 +193,7 @@ describe('authorization', () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
 			requiredRoles: {
 				realm: [REALM_ACCESS_ROLE]
@@ -167,7 +213,7 @@ describe('authorization', () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
 			requiredRoles: {
 				client: [CLIENT_ACCESS_ROLE]
@@ -187,7 +233,7 @@ describe('authorization', () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
 			requiredRoles: {
 				realm: ['abc']
@@ -206,7 +252,7 @@ describe('authorization', () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
 			requiredRoles: {
 				client: ['abc']
@@ -231,7 +277,7 @@ describe('authorization', () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED, newToken);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
 			requiredRoles: {
 				realm: [REALM_ACCESS_ROLE]
@@ -264,7 +310,7 @@ describe('authorization', () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED, newToken);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
 			requiredRoles: {
 				client: [CLIENT_ACCESS_ROLE]
@@ -283,5 +329,17 @@ describe('authorization', () => {
 				error: ACCESS_DENIED_ERROR
 			}
 		]);
+	});
+
+	it('uses the default auth server host if none is provided', () => {
+		createKeycloakAuthorization({
+			realm: REALM,
+			clientId: CLIENT_ID
+		});
+		expect(MockKeycloak.lastConfig).toEqual({
+			realm: REALM,
+			clientId: CLIENT_ID,
+			url: AUTH_SERVER_URL
+		});
 	});
 });

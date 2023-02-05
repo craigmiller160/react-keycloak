@@ -7,8 +7,9 @@ export type RequiredRoles = {
 
 export type KeycloakAuthConfig = {
 	readonly realm: string;
-	readonly authServerUrl: string;
+	readonly authServerUrl?: string;
 	readonly clientId: string;
+	readonly localStorageKey?: string;
 	readonly requiredRoles?: Partial<RequiredRoles>;
 };
 
