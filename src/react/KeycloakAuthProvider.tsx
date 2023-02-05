@@ -17,7 +17,6 @@ type State = KeycloakAuth & {
 export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
 	const [state, setState] = useState<State>({
 		status: 'pre-auth',
-		isAuthorized: false,
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		logout: () => {},
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -43,7 +42,7 @@ export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
 				(token, tokenParsed) =>
 					setState((prevState) => ({
 						...prevState,
-						status: 'post-auth',
+						status: 'authorized',
 						isAuthorized: true,
 						token,
 						tokenParsed
@@ -51,7 +50,7 @@ export const KeycloakAuthProvider = (props: PropsWithChildren<Props>) => {
 				(error) =>
 					setState((prevState) => ({
 						...prevState,
-						status: 'post-auth',
+						status: 'unauthorized',
 						isAuthorized: false,
 						token: undefined,
 						tokenParsed: undefined,

@@ -1,4 +1,4 @@
-// export { KeycloakAuthContext } from './react/KeycloakAuthContext';
+export { KeycloakAuthContext } from './react/KeycloakAuthContext';
 // export type {
 // 	KeycloakAuth,
 // 	KeycloakAuthStatus
