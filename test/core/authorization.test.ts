@@ -189,8 +189,7 @@ describe('authorization', () => {
 		const results = await promisify(1)(authorize);
 		expect(results).toEqual([
 			{
-				token: TOKEN,
-				tokenParsed: TOKEN_PARSED
+				error: ACCESS_DENIED_ERROR
 			}
 		]);
 	});
@@ -208,8 +207,7 @@ describe('authorization', () => {
 		const results = await promisify(1)(authorize);
 		expect(results).toEqual([
 			{
-				token: TOKEN,
-				tokenParsed: TOKEN_PARSED
+				error: ACCESS_DENIED_ERROR
 			}
 		]);
 	});
