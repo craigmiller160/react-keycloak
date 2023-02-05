@@ -6,7 +6,7 @@ import { createKeycloakAuthorization } from '../core';
 
 type Props = {
 	readonly realm: string;
-	readonly authServerUrl: string;
+	readonly authServerUrl?: string;
 	readonly clientId: string;
 	readonly requiredRoles?: Partial<RequiredRoles>;
 };

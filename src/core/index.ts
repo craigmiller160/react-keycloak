@@ -6,6 +6,7 @@ import {
 } from './types';
 import Keycloak from 'keycloak-js';
 import { newDate } from '../utils/newDate';
+import { AUTH_SERVER_URL } from './constants';
 
 const hasRequiredRoles = (
 	keycloak: Keycloak,
@@ -27,7 +28,7 @@ export const createKeycloakAuthorization: CreateKeycloakAuthorization = (
 	config: KeycloakAuthConfig
 ) => {
 	const keycloak = new Keycloak({
-		url: config.authServerUrl,
+		url: config.authServerUrl ?? AUTH_SERVER_URL,
 		realm: config.realm,
 		clientId: config.clientId
 	});
