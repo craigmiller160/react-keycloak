@@ -11,7 +11,9 @@ import {
 	MOCK_AUTH_SERVER_URL,
 	CLIENT_ID,
 	REALM,
-	TOKEN_PARSED
+	TOKEN_PARSED,
+	LOCAL_STORAGE_KEY,
+	TOKEN
 } from '../testutils/data';
 
 const KeycloakRenderer = () => {
@@ -27,13 +29,19 @@ const KeycloakRenderer = () => {
 	);
 };
 
-const doRender = (requiredRoles?: Partial<RequiredRoles>) =>
+type RenderConfig = {
+	readonly requiredRoles?: Partial<RequiredRoles>;
+	readonly localStorageKey?: string;
+};
+
+const doRender = (config?: RenderConfig) =>
 	render(
 		<KeycloakAuthProvider
 			realm={REALM}
 			authServerUrl={MOCK_AUTH_SERVER_URL}
 			clientId={CLIENT_ID}
-			requiredRoles={requiredRoles}
+			requiredRoles={config?.requiredRoles}
+			localStorageKey={config?.localStorageKey}
 		>
 			<KeycloakRenderer />
 		</KeycloakAuthProvider>
@@ -63,7 +71,27 @@ describe('KeycloakAuthProvider', () => {
 		expect(screen.getByText(/Token:/)).toHaveTextContent('true');
 		expect(screen.getByText(/Token Parsed/)).toHaveTextContent('true');
 		expect(screen.getByText(/Error/)).toHaveTextContent('false');
-		// expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toEqual(TOKEN);
+
+		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toBeNull();
+	});
+
+	it('handles a successful authentication with token going to localStorage', async () => {
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		doRender();
+		await waitFor(() =>
+			expect(MockKeycloak.lastConfig).not.toBeUndefined()
+		);
+		expect(MockKeycloak.lastConfig).toEqual({
+			url: MOCK_AUTH_SERVER_URL,
+			realm: REALM,
+			clientId: CLIENT_ID
+		});
+		expect(screen.getByText(/Auth Status/)).toHaveTextContent('authorized');
+		expect(screen.getByText(/Token:/)).toHaveTextContent('true');
+		expect(screen.getByText(/Token Parsed/)).toHaveTextContent('true');
+		expect(screen.getByText(/Error/)).toHaveTextContent('false');
+
+		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toEqual(TOKEN);
 	});
 
 	it('handles a failed authentication', async () => {
@@ -85,6 +113,5 @@ describe('KeycloakAuthProvider', () => {
 		expect(screen.getByText(/Token:/)).toHaveTextContent('false');
 		expect(screen.getByText(/Token Parsed/)).toHaveTextContent('false');
 		expect(screen.getByText(/Error/)).toHaveTextContent('true');
-		// expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toBeNull();
 	});
 });
