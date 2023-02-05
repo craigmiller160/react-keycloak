@@ -39,4 +39,4 @@ const Child = () => {
 };
 ```
 
-The `status` indicates at what state of the process the authorization is currently at. Values can be `pre-auth`, `authorizing`, `authorized`, and `unauthorized`. When `authorized`, the `token` and `tokenParsed` values will be available. When `unauthorized`, the error value will be available.
+The `status` indicates at what state of the process the authorization is currently at. Values can be `authorizing`, `authorized`, and `unauthorized`. When `authorized`, the `token` and `tokenParsed` values will be available. When `unauthorized`, the error value will be available.
