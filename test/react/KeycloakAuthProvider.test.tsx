@@ -13,7 +13,8 @@ import {
 	REALM,
 	TOKEN_PARSED,
 	LOCAL_STORAGE_KEY,
-	TOKEN
+	TOKEN,
+	REALM_ACCESS_ROLE
 } from '../testutils/data';
 
 const KeycloakRenderer = () => {
@@ -97,11 +98,46 @@ describe('KeycloakAuthProvider', () => {
 	});
 
 	it('handles a successful authentication with required roles', async () => {
-		throw new Error();
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		doRender({
+			localStorageKey: LOCAL_STORAGE_KEY,
+			requiredRoles: {
+				realm: [REALM_ACCESS_ROLE]
+			}
+		});
+		await waitFor(() =>
+			expect(MockKeycloak.lastConfig).not.toBeUndefined()
+		);
+		expect(MockKeycloak.lastConfig).toEqual({
+			url: MOCK_AUTH_SERVER_URL,
+			realm: REALM,
+			clientId: CLIENT_ID
+		});
+		expect(screen.getByText(/Auth Status/)).toHaveTextContent('authorized');
+		expect(screen.getByText(/Token:/)).toHaveTextContent('true');
+		expect(screen.getByText(/Token Parsed/)).toHaveTextContent('true');
+		expect(screen.getByText(/Error/)).toHaveTextContent('false');
 	});
 
 	it('handles a failed authentication due to required roles', async () => {
-		throw new Error();
+		MockKeycloak.setAuthResults(TOKEN_PARSED);
+		doRender({
+			localStorageKey: LOCAL_STORAGE_KEY,
+			requiredRoles: {
+				realm: ['abc']
+			}
+		});
+		await waitFor(() =>
+			expect(MockKeycloak.lastConfig).not.toBeUndefined()
+		);
+		expect(MockKeycloak.lastConfig).toEqual({
+			url: MOCK_AUTH_SERVER_URL,
+			realm: REALM,
+			clientId: CLIENT_ID
+		});
+		expect(screen.getByText(/Token:/)).toHaveTextContent('false');
+		expect(screen.getByText(/Token Parsed/)).toHaveTextContent('false');
+		expect(screen.getByText(/Error/)).toHaveTextContent('true');
 	});
 
 	it('handles a failed authentication', async () => {
