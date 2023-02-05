@@ -15,6 +15,7 @@ const App = () => (
         clientId={CLIENT_ID}
         requiredRoles={REQUIRED_ROLES} // Optional
         authServerUrl={AUTH_SERVER_URL} // Optional override, defaults to deployed auth server
+        localStorageKey={LOCAL_STORAGE_KEY} // Optional, if provided the token will always be put in local storage with this key
     >
         <div />
     </KeycloakAuthProvider>
