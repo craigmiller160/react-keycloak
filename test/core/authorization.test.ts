@@ -2,7 +2,7 @@ import { beforeEach, describe, it, vi, afterEach, expect } from 'vitest';
 import {
 	ACCESS_DENIED_ERROR,
 	ACCESS_TOKEN_EXP,
-	AUTH_SERVER_URL,
+	MOCK_AUTH_SERVER_URL,
 	CLIENT_ACCESS_ROLE,
 	CLIENT_ID,
 	REALM,
@@ -16,6 +16,7 @@ import { AuthorizeWithKeycloak } from '../../src/core/types';
 import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
 import { createKeycloakAuthorization } from '../../src/core';
 import { MockKeycloak } from '../mocks/MockKeycloak';
+import { AUTH_SERVER_URL } from '../../src/core/constants';
 
 const advancePastRefresh = () =>
 	vi.advanceTimersByTime((ACCESS_TOKEN_EXP - 30) * 1000 + 10);
@@ -69,7 +70,7 @@ describe('authorization', () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID
 		});
 		expect(logout).toBeInstanceOf(Function);
@@ -86,7 +87,7 @@ describe('authorization', () => {
 		MockKeycloak.setAuthResults(null);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID
 		});
 		expect(logout).toBeInstanceOf(Function);
@@ -102,7 +103,7 @@ describe('authorization', () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED, TOKEN_PARSED);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID
 		});
 		expect(logout).toBeInstanceOf(Function);
@@ -125,7 +126,7 @@ describe('authorization', () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED, null);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID
 		});
 		expect(logout).toBeInstanceOf(Function);
@@ -147,7 +148,7 @@ describe('authorization', () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
 			requiredRoles: {
 				realm: [REALM_ACCESS_ROLE]
@@ -167,7 +168,7 @@ describe('authorization', () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
 			requiredRoles: {
 				client: [CLIENT_ACCESS_ROLE]
@@ -187,7 +188,7 @@ describe('authorization', () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
 			requiredRoles: {
 				realm: ['abc']
@@ -206,7 +207,7 @@ describe('authorization', () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
 			requiredRoles: {
 				client: ['abc']
@@ -231,7 +232,7 @@ describe('authorization', () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED, newToken);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
 			requiredRoles: {
 				realm: [REALM_ACCESS_ROLE]
@@ -264,7 +265,7 @@ describe('authorization', () => {
 		MockKeycloak.setAuthResults(TOKEN_PARSED, newToken);
 		const [authorize, logout] = createKeycloakAuthorization({
 			realm: REALM,
-			authServerUrl: AUTH_SERVER_URL,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
 			clientId: CLIENT_ID,
 			requiredRoles: {
 				client: [CLIENT_ACCESS_ROLE]
@@ -283,5 +284,17 @@ describe('authorization', () => {
 				error: ACCESS_DENIED_ERROR
 			}
 		]);
+	});
+
+	it('uses the default auth server host if none is provided', () => {
+		createKeycloakAuthorization({
+			realm: REALM,
+			clientId: CLIENT_ID
+		});
+		expect(MockKeycloak.lastConfig).toEqual({
+			realm: REALM,
+			clientId: CLIENT_ID,
+			url: AUTH_SERVER_URL
+		});
 	});
 });

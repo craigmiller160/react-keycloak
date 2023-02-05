@@ -8,7 +8,7 @@ import {
 import { MockKeycloak } from '../mocks/MockKeycloak';
 import { useContext } from 'react';
 import {
-	AUTH_SERVER_URL,
+	MOCK_AUTH_SERVER_URL,
 	CLIENT_ID,
 	REALM,
 	TOKEN_PARSED
@@ -31,7 +31,7 @@ const doRender = (requiredRoles?: Partial<RequiredRoles>) =>
 	render(
 		<KeycloakAuthProvider
 			realm={REALM}
-			authServerUrl={AUTH_SERVER_URL}
+			authServerUrl={MOCK_AUTH_SERVER_URL}
 			clientId={CLIENT_ID}
 			requiredRoles={requiredRoles}
 		>
@@ -51,7 +51,7 @@ describe('KeycloakAuthProvider', () => {
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
 		);
 		expect(MockKeycloak.lastConfig).toEqual({
-			url: AUTH_SERVER_URL,
+			url: MOCK_AUTH_SERVER_URL,
 			realm: REALM,
 			clientId: CLIENT_ID
 		});
@@ -69,7 +69,7 @@ describe('KeycloakAuthProvider', () => {
 			expect(MockKeycloak.lastConfig).not.toBeUndefined()
 		);
 		expect(MockKeycloak.lastConfig).toEqual({
-			url: AUTH_SERVER_URL,
+			url: MOCK_AUTH_SERVER_URL,
 			realm: REALM,
 			clientId: CLIENT_ID
 		});

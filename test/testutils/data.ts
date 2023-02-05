@@ -2,7 +2,7 @@ import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
 import { newDate } from '../../src/utils/newDate';
 
 export const CLIENT_ID = 'test-client';
-export const AUTH_SERVER_URL = 'https://auth-server.com';
+export const MOCK_AUTH_SERVER_URL = 'https://auth-server.com';
 export const ACCESS_TOKEN_EXP = 60;
 export const REALM = 'realm';
 export const LOCAL_STORAGE_KEY = 'local-storage-key';
