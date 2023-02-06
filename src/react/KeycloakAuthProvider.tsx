@@ -17,10 +17,16 @@ export const KeycloakAuthProvider = (
 		status: 'pre-auth'
 	});
 
+	// Necessary to be able to stringify
+	const keycloakConfig: KeycloakAuthConfig & { children: undefined } = {
+		...props,
+		children: undefined
+	};
+
 	const [authorize, logout] = useMemo(
-		() => createKeycloakAuthorization(props),
+		() => createKeycloakAuthorization(keycloakConfig),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[JSON.stringify(props)]
+		[JSON.stringify(keycloakConfig)]
 	);
 
 	useEffect(() => {
