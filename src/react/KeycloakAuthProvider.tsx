@@ -3,8 +3,12 @@ import { KeycloakAuthContext } from './KeycloakAuthContext';
 import type { KeycloakAuth } from './types';
 import { KeycloakAuthConfig } from '../core/types';
 import { createKeycloakAuthorization } from '../core';
+import { isPostAuthorization, isPreAuthorization } from './status';
 
-type ProviderState = Omit<KeycloakAuth, 'logout'>;
+type ProviderState = Omit<
+	KeycloakAuth,
+	'logout' | 'isPreAuthorization' | 'isPostAuthorization'
+>;
 
 export const KeycloakAuthProvider = (
 	props: PropsWithChildren<KeycloakAuthConfig>
@@ -50,7 +54,9 @@ export const KeycloakAuthProvider = (
 
 	const authValue: KeycloakAuth = {
 		...state,
-		logout
+		logout,
+		isPreAuthorization: isPreAuthorization(state.status),
+		isPostAuthorization: isPostAuthorization(state.status)
 	};
 
 	return (
