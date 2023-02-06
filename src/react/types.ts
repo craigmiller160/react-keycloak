@@ -13,4 +13,6 @@ export type KeycloakAuth = {
 	readonly tokenParsed?: KeycloakTokenParsed;
 	readonly error?: KeycloakError;
 	readonly logout: Logout;
+	readonly isPreAuthorization: boolean;
+	readonly isPostAuthorization: boolean;
 };
