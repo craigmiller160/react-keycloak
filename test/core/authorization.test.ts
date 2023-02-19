@@ -130,6 +130,7 @@ describe('authorization', () => {
 				error: UNAUTHORIZED_ERROR
 			}
 		]);
+		expect(navigateMock).not.toHaveBeenCalled();
 	});
 
 	it('handles a failed authentication and clears the token from localStorage', async () => {
@@ -195,6 +196,7 @@ describe('authorization', () => {
 				error: REFRESH_ERROR
 			}
 		]);
+		expect(navigateMock).not.toHaveBeenCalled();
 	});
 
 	it('handles a successful authorization with the required realm roles', async () => {
@@ -365,6 +367,7 @@ describe('authorization', () => {
 				error: ACCESS_DENIED_ERROR
 			}
 		]);
+		expect(navigateMock).toHaveBeenCalledWith(ACCESS_DENIED_URL);
 	});
 
 	it('handles a successful authentication but a failed refresh because client role removed', async () => {
@@ -400,6 +403,7 @@ describe('authorization', () => {
 				error: ACCESS_DENIED_ERROR
 			}
 		]);
+		expect(navigateMock).toHaveBeenCalledWith(ACCESS_DENIED_URL);
 	});
 
 	it('uses the default auth server host if none is provided', () => {

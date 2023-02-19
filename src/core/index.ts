@@ -60,7 +60,10 @@ const createHandleOnSuccess =
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const exp = keycloak.tokenParsed!.exp! * 1000;
 
-		setTimeout(() => keycloak.updateToken(40), exp - current - 30_000);
+		const timeout = exp - current - 30_000;
+		if (timeout > 0) {
+			setTimeout(() => keycloak.updateToken(40), exp - current - 30_000);
+		}
 	};
 
 const createHandleOnFailure =
@@ -74,7 +77,10 @@ const createHandleOnFailure =
 		const doAccessDeniedRedirect = config.doAccessDeniedRedirect ?? true;
 		const accessDeniedUrl = config.accessDeniedUrl ?? ACCESS_DENIED_URL;
 
-		if (doAccessDeniedRedirect) {
+		if (
+			error.error === ACCESS_DENIED_ERROR.error &&
+			doAccessDeniedRedirect
+		) {
 			navigate(accessDeniedUrl);
 		}
 
