@@ -60,7 +60,10 @@ const createHandleOnSuccess =
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const exp = keycloak.tokenParsed!.exp! * 1000;
 
-		setTimeout(() => keycloak.updateToken(40), exp - current - 30_000);
+		const timeout = exp - current - 30_000;
+		if (timeout > 0) {
+			setTimeout(() => keycloak.updateToken(40), exp - current - 30_000);
+		}
 	};
 
 const createHandleOnFailure =

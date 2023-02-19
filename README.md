@@ -40,3 +40,7 @@ const Child = () => {
 ```
 
 The `status` indicates at what state of the process the authorization is currently at. Values can be `pre-auth`, `authorizing`, `authorized`, and `unauthorized`. When `authorized`, the `token` and `tokenParsed` values will be available. When `unauthorized`, the error value will be available.
+
+## A Note On Timeouts
+
+If at any point in time a successful authentication returns a token that expires less than 30 seconds later, this library will not attempt a subsequent refresh. This is because such a scenario is assumed to mean the user's session is over and needs to expire.
