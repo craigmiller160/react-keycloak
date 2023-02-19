@@ -7,7 +7,7 @@
   },
   "main": "lib/index.js",
   "files": [
-    "./lib"
+    "lib"
   ],
   "scripts": {
     "prepare": "husky install",
