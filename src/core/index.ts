@@ -74,7 +74,10 @@ const createHandleOnFailure =
 		const doAccessDeniedRedirect = config.doAccessDeniedRedirect ?? true;
 		const accessDeniedUrl = config.accessDeniedUrl ?? ACCESS_DENIED_URL;
 
-		if (doAccessDeniedRedirect) {
+		if (
+			error.error === ACCESS_DENIED_ERROR.error &&
+			doAccessDeniedRedirect
+		) {
 			navigate(accessDeniedUrl);
 		}
 
