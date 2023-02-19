@@ -130,6 +130,7 @@ describe('authorization', () => {
 				error: UNAUTHORIZED_ERROR
 			}
 		]);
+		throw new Error('Check for access denied here');
 	});
 
 	it('handles a failed authentication and clears the token from localStorage', async () => {
@@ -195,6 +196,7 @@ describe('authorization', () => {
 				error: REFRESH_ERROR
 			}
 		]);
+		throw new Error('Add check');
 	});
 
 	it('handles a successful authorization with the required realm roles', async () => {
