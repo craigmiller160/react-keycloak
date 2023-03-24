@@ -203,7 +203,28 @@ describe('authorization', () => {
 	});
 
 	it('handles a successful authorization, and a failed refresh, with login redirect disabled', async () => {
-		throw new Error();
+		MockKeycloak.setAuthResults(TOKEN_PARSED, null);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			doLoginRedirectOnRefreshFailed: false
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const promise = promisify(2)(authorize);
+		advancePastRefresh();
+		const results = await promise;
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			},
+			{
+				error: REFRESH_ERROR
+			}
+		]);
+		expect(navigateMock).not.toHaveBeenCalled();
+		throw new Error('Needs to not invoke login');
 	});
 
 	it('handles a successful authorization with the required realm roles', async () => {
