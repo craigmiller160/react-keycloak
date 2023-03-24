@@ -12,6 +12,7 @@ export type KeycloakAuthConfig = {
 	readonly localStorageKey?: string;
 	readonly requiredRoles?: RequiredRoles;
 	readonly doAccessDeniedRedirect?: boolean;
+	readonly doLoginRedirectOnRefreshFailed?: boolean;
 	readonly accessDeniedUrl?: string;
 };
 

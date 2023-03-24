@@ -10,6 +10,7 @@ export class MockKeycloak {
 	static lastConfig?: KeycloakConfig = undefined;
 	static lastInit?: KeycloakInitOptions = undefined;
 	private static authResults: ReadonlyArray<KeycloakTokenParsed | null> = [];
+	static loginCount = 0;
 
 	static setAuthResults(
 		...authResults: ReadonlyArray<KeycloakTokenParsed | null>
@@ -21,6 +22,7 @@ export class MockKeycloak {
 		MockKeycloak.lastConfig = undefined;
 		MockKeycloak.lastInit = undefined;
 		MockKeycloak.authResults = [];
+		MockKeycloak.loginCount = 0;
 	}
 
 	token?: string;
@@ -90,6 +92,10 @@ export class MockKeycloak {
 
 	// eslint-disable-next-line @typescript-eslint/no-empty-function
 	logout() {}
+
+	login() {
+		MockKeycloak.loginCount++;
+	}
 
 	onAuthSuccess?: () => void;
 

@@ -131,6 +131,7 @@ describe('authorization', () => {
 			}
 		]);
 		expect(navigateMock).not.toHaveBeenCalled();
+		expect(MockKeycloak.loginCount).toEqual(0);
 	});
 
 	it('handles a failed authentication and clears the token from localStorage', async () => {
@@ -151,6 +152,7 @@ describe('authorization', () => {
 		]);
 
 		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toBeNull();
+		expect(MockKeycloak.loginCount).toEqual(0);
 	});
 
 	it('handles a successful authorization, and a successful refresh', async () => {
@@ -197,6 +199,32 @@ describe('authorization', () => {
 			}
 		]);
 		expect(navigateMock).not.toHaveBeenCalled();
+		expect(MockKeycloak.loginCount).toEqual(1);
+	});
+
+	it('handles a successful authorization, and a failed refresh, with login redirect disabled', async () => {
+		MockKeycloak.setAuthResults(TOKEN_PARSED, null);
+		const [authorize, logout] = createKeycloakAuthorization({
+			realm: REALM,
+			authServerUrl: MOCK_AUTH_SERVER_URL,
+			clientId: CLIENT_ID,
+			doLoginRedirectOnRefreshFailed: false
+		});
+		expect(logout).toBeInstanceOf(Function);
+		const promise = promisify(2)(authorize);
+		advancePastRefresh();
+		const results = await promise;
+		expect(results).toEqual([
+			{
+				token: TOKEN,
+				tokenParsed: TOKEN_PARSED
+			},
+			{
+				error: REFRESH_ERROR
+			}
+		]);
+		expect(navigateMock).not.toHaveBeenCalled();
+		expect(MockKeycloak.loginCount).toEqual(0);
 	});
 
 	it('handles a successful authorization with the required realm roles', async () => {
@@ -368,6 +396,7 @@ describe('authorization', () => {
 			}
 		]);
 		expect(navigateMock).toHaveBeenCalledWith(ACCESS_DENIED_URL);
+		expect(MockKeycloak.loginCount).toEqual(0);
 	});
 
 	it('handles a successful authentication but a failed refresh because client role removed', async () => {
@@ -404,6 +433,7 @@ describe('authorization', () => {
 			}
 		]);
 		expect(navigateMock).toHaveBeenCalledWith(ACCESS_DENIED_URL);
+		expect(MockKeycloak.loginCount).toEqual(0);
 	});
 
 	it('uses the default auth server host if none is provided', () => {

@@ -67,7 +67,7 @@ const createHandleOnSuccess =
 	};
 
 const createHandleOnFailure =
-	(config: KeycloakAuthConfig) =>
+	(keycloak: Keycloak, config: KeycloakAuthConfig) =>
 	(onFailure: KeycloakAuthFailedHandler) =>
 	(error: KeycloakError) => {
 		if (config.localStorageKey) {
@@ -75,6 +75,8 @@ const createHandleOnFailure =
 		}
 
 		const doAccessDeniedRedirect = config.doAccessDeniedRedirect ?? true;
+		const doLoginRedirectOnRefreshFailed =
+			config.doLoginRedirectOnRefreshFailed ?? true;
 		const accessDeniedUrl = config.accessDeniedUrl ?? ACCESS_DENIED_URL;
 
 		if (
@@ -82,6 +84,13 @@ const createHandleOnFailure =
 			doAccessDeniedRedirect
 		) {
 			navigate(accessDeniedUrl);
+		}
+
+		if (
+			error.error === REFRESH_ERROR.error &&
+			doLoginRedirectOnRefreshFailed
+		) {
+			keycloak.login();
 		}
 
 		onFailure(error);
@@ -95,7 +104,7 @@ export const createKeycloakAuthorization: CreateKeycloakAuthorization = (
 		realm: config.realm,
 		clientId: config.clientId
 	});
-	const handleOnFailure = createHandleOnFailure(config);
+	const handleOnFailure = createHandleOnFailure(keycloak, config);
 	const handleOnSuccess = createHandleOnSuccess(keycloak, config);
 	const authorize: AuthorizeWithKeycloak = (onSuccess, onFailure) => {
 		keycloak.onAuthSuccess = handleOnSuccess(
