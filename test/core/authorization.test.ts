@@ -131,6 +131,7 @@ describe('authorization', () => {
 			}
 		]);
 		expect(navigateMock).not.toHaveBeenCalled();
+		throw new Error('Needs to not invoke login');
 	});
 
 	it('handles a failed authentication and clears the token from localStorage', async () => {
@@ -151,6 +152,7 @@ describe('authorization', () => {
 		]);
 
 		expect(localStorage.getItem(LOCAL_STORAGE_KEY)).toBeNull();
+		throw new Error('Needs to not invoke login');
 	});
 
 	it('handles a successful authorization, and a successful refresh', async () => {
@@ -197,6 +199,11 @@ describe('authorization', () => {
 			}
 		]);
 		expect(navigateMock).not.toHaveBeenCalled();
+		throw new Error('Needs to invoke login');
+	});
+
+	it('handles a successful authorization, and a failed refresh, with login redirect disabled', async () => {
+		throw new Error();
 	});
 
 	it('handles a successful authorization with the required realm roles', async () => {
@@ -368,6 +375,7 @@ describe('authorization', () => {
 			}
 		]);
 		expect(navigateMock).toHaveBeenCalledWith(ACCESS_DENIED_URL);
+		throw new Error('Needs to not invoke login');
 	});
 
 	it('handles a successful authentication but a failed refresh because client role removed', async () => {
@@ -404,6 +412,7 @@ describe('authorization', () => {
 			}
 		]);
 		expect(navigateMock).toHaveBeenCalledWith(ACCESS_DENIED_URL);
+		throw new Error('Needs to not invoke login');
 	});
 
 	it('uses the default auth server host if none is provided', () => {
