@@ -11,13 +11,13 @@
   ],
   "scripts": {
     "prepare": "husky install",
-    "lint": "eslint --fix --max-warnings=0 **/**.{ts,tsx}",
+    "lint": "craig-lint",
     "force-build": "rm -rf ./lib && tsc",
-    "build": "yarn lint && yarn test && yarn force-build",
+    "build": "npm run lint && npm run test && npm run force-build",
     "test": "vitest"
   },
   "lint-staged": {
-    "*.{ts,tsx}": "eslint --fix --max-warnings=0"
+    "*.{ts,tsx}": "craig-lint"
   },
   "peerDependencies": {
     "react": "^18.2.0"
