@@ -16,8 +16,8 @@ import {
 	TOKEN,
 	REALM_ACCESS_ROLE
 } from '../testutils/data';
-import { navigate } from '../../src/utils/navigate';
-import { ACCESS_DENIED_URL } from '../../src/core/constants';
+import { navigate } from '@craigmiller160/keycloak-js/utils/navigate';
+import { ACCESS_DENIED_URL } from '@craigmiller160/keycloak-js';
 
 const KeycloakRenderer = () => {
 	const { status, token, tokenParsed, error } =

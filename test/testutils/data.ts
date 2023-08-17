@@ -1,5 +1,5 @@
 import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
-import { newDate } from '../../src/utils/newDate';
+import { newDate } from '@craigmiller160/keycloak-js/utils/newDate';
 
 export const CLIENT_ID = 'test-client';
 export const MOCK_AUTH_SERVER_URL = 'https://auth-server.com';
