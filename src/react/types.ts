@@ -1,5 +1,5 @@
 import { KeycloakError, KeycloakTokenParsed } from 'keycloak-js';
-import { Logout } from '../core/types';
+import { Logout } from '@craigmiller160/keycloak-js';
 
 export type KeycloakAuthStatus =
 	| 'pre-auth'

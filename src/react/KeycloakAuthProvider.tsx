@@ -1,8 +1,10 @@
 import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { KeycloakAuthContext } from './KeycloakAuthContext';
 import type { KeycloakAuth } from './types';
-import { KeycloakAuthConfig } from '../core/types';
-import { createKeycloakAuthorization } from '../core';
+import {
+	createKeycloakAuthorization,
+	KeycloakAuthConfig
+} from '@craigmiller160/keycloak-js';
 import { isPostAuthorization, isPreAuthorization } from './status';
 
 type ProviderState = Omit<
