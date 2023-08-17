@@ -14,9 +14,14 @@ import {
 	TOKEN_PARSED,
 	LOCAL_STORAGE_KEY,
 	TOKEN,
-	REALM_ACCESS_ROLE, TEST_DATE
+	REALM_ACCESS_ROLE,
+	TEST_DATE
 } from '../testutils/data';
-import { ACCESS_DENIED_URL } from '@craigmiller160/keycloak-js';
+import {
+	ACCESS_DENIED_URL,
+	InternalKeycloakOverrides
+} from '@craigmiller160/keycloak-js';
+import { KeycloakAuthInternalContext } from '../../src/react/KeycloakAuthInternalContext';
 
 const KeycloakRenderer = () => {
 	const { status, token, tokenParsed, error } =
@@ -38,23 +43,30 @@ type RenderConfig = {
 	readonly accessDeniedUrl?: string;
 };
 
-const doRender = (config?: RenderConfig) =>
-	render(
-		<KeycloakAuthProvider
-			realm={REALM}
-			authServerUrl={MOCK_AUTH_SERVER_URL}
-			clientId={CLIENT_ID}
-			requiredRoles={config?.requiredRoles}
-			localStorageKey={config?.localStorageKey}
-			doAccessDeniedRedirect={config?.doAccessDeniedRedirect}
-			accessDeniedUrl={config?.accessDeniedUrl}
-		>
-			<KeycloakRenderer />
-		</KeycloakAuthProvider>
-	);
-
 const navigateMock = vi.fn<[string], void>();
 const newDate = () => TEST_DATE;
+
+const overrides: InternalKeycloakOverrides = {
+	navigate: navigateMock,
+	newDate
+};
+
+const doRender = (config?: RenderConfig) =>
+	render(
+		<KeycloakAuthInternalContext.Provider value={overrides}>
+			<KeycloakAuthProvider
+				realm={REALM}
+				authServerUrl={MOCK_AUTH_SERVER_URL}
+				clientId={CLIENT_ID}
+				requiredRoles={config?.requiredRoles}
+				localStorageKey={config?.localStorageKey}
+				doAccessDeniedRedirect={config?.doAccessDeniedRedirect}
+				accessDeniedUrl={config?.accessDeniedUrl}
+			>
+				<KeycloakRenderer />
+			</KeycloakAuthProvider>
+		</KeycloakAuthInternalContext.Provider>
+	);
 
 describe('KeycloakAuthProvider', () => {
 	beforeEach(() => {
