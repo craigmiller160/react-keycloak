@@ -10,14 +10,6 @@ afterEach(() => {
 	cleanup();
 });
 
-vi.mock('@craigmiller160/keycloak-js/utils', () => {
-	const date = new Date();
-	return {
-		newDate: () => date,
-		navigate: vi.fn()
-	};
-});
-
 vi.mock('keycloak-js', async () => {
 	const mock = await vi.importActual<{ MockKeycloak: MockKeycloak }>(
 		'./mocks/MockKeycloak'
