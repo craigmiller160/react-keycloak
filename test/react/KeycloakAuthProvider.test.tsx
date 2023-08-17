@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, afterEach, Mock } from 'vitest';
+import { beforeEach, describe, expect, it, afterEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import {
 	KeycloakAuthContext,
@@ -14,9 +14,8 @@ import {
 	TOKEN_PARSED,
 	LOCAL_STORAGE_KEY,
 	TOKEN,
-	REALM_ACCESS_ROLE
+	REALM_ACCESS_ROLE, TEST_DATE
 } from '../testutils/data';
-import { navigate } from '@craigmiller160/keycloak-js/utils';
 import { ACCESS_DENIED_URL } from '@craigmiller160/keycloak-js';
 
 const KeycloakRenderer = () => {
@@ -54,7 +53,8 @@ const doRender = (config?: RenderConfig) =>
 		</KeycloakAuthProvider>
 	);
 
-const navigateMock = navigate as Mock<[string], void>;
+const navigateMock = vi.fn<[string], void>();
+const newDate = () => TEST_DATE;
 
 describe('KeycloakAuthProvider', () => {
 	beforeEach(() => {
