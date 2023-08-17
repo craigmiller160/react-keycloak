@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@craigmiller160/keycloak-js':
-    specifier: 1.0.0-beta.2
-    version: 1.0.0-beta.2
+    specifier: 1.0.0-beta.3
+    version: 1.0.0-beta.3
   keycloak-js:
     specifier: ^20.0.3
     version: 20.0.3
@@ -1510,8 +1510,8 @@ packages:
       - supports-color
     dev: true
 
-  /@craigmiller160/keycloak-js@1.0.0-beta.2:
-    resolution: {integrity: sha512-DXNjLJardxPvmX8GkpWet5460ifsWUf7i4QvwVCJBvfJtMJEkmnwt0luY1UDmgbcDNhmd8TO51HCb2juhIYx0A==}
+  /@craigmiller160/keycloak-js@1.0.0-beta.3:
+    resolution: {integrity: sha512-6lwmeuRMhqpQZDw6r2pyMgqCa+7n7gzbVt4pitubzVBMP3ITWtEpX1C112yJoe9XL5QsY9/rNGkGR1ed4ni4VQ==}
     dependencies:
       keycloak-js: 20.0.3
     dev: false

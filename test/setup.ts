@@ -10,14 +10,14 @@ afterEach(() => {
 	cleanup();
 });
 
-vi.mock('../src/utils/newDate', () => {
+vi.mock('@craigmiller160/keycloak-js/utils/newDate', () => {
 	const date = new Date();
 	return {
 		newDate: () => date
 	};
 });
 
-vi.mock('../src/utils/navigate', () => ({
+vi.mock('@craigmiller160/keycloak-js/utils/navigate', () => ({
 	navigate: vi.fn()
 }));
 
