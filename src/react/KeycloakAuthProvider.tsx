@@ -1,11 +1,19 @@
-import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
+import {
+	PropsWithChildren,
+	useContext,
+	useEffect,
+	useMemo,
+	useState
+} from 'react';
 import { KeycloakAuthContext } from './KeycloakAuthContext';
 import type { KeycloakAuth } from './types';
 import {
 	createKeycloakAuthorization,
+	InternalKeycloakAuthConfig,
 	KeycloakAuthConfig
 } from '@craigmiller160/keycloak-js';
 import { isPostAuthorization, isPreAuthorization } from './status';
+import { KeycloakAuthInternalContext } from './KeycloakAuthInternalContext';
 
 type ProviderState = Omit<
 	KeycloakAuth,
@@ -19,11 +27,16 @@ export const KeycloakAuthProvider = (
 		status: 'pre-auth'
 	});
 
+	const { newDate, navigate } = useContext(KeycloakAuthInternalContext);
+
 	// Necessary to be able to stringify
-	const keycloakConfig: KeycloakAuthConfig & { children: undefined } = {
-		...props,
-		children: undefined
-	};
+	const keycloakConfig: InternalKeycloakAuthConfig & { children: undefined } =
+		{
+			...props,
+			children: undefined,
+			newDate,
+			navigate
+		};
 
 	const [authorize, logout] = useMemo(
 		() => createKeycloakAuthorization(keycloakConfig),
