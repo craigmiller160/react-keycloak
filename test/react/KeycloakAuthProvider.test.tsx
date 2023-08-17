@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, afterEach, Mock } from 'vitest';
+import { beforeEach, describe, expect, it, afterEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import {
 	KeycloakAuthContext,
@@ -14,10 +14,14 @@ import {
 	TOKEN_PARSED,
 	LOCAL_STORAGE_KEY,
 	TOKEN,
-	REALM_ACCESS_ROLE
+	REALM_ACCESS_ROLE,
+	TEST_DATE
 } from '../testutils/data';
-import { navigate } from '../../src/utils/navigate';
-import { ACCESS_DENIED_URL } from '../../src/core/constants';
+import {
+	ACCESS_DENIED_URL,
+	InternalKeycloakOverrides
+} from '@craigmiller160/keycloak-js';
+import { KeycloakAuthInternalContext } from '../../src/react/KeycloakAuthInternalContext';
 
 const KeycloakRenderer = () => {
 	const { status, token, tokenParsed, error } =
@@ -39,22 +43,30 @@ type RenderConfig = {
 	readonly accessDeniedUrl?: string;
 };
 
+const navigateMock = vi.fn<[string], void>();
+const newDate = () => TEST_DATE;
+
+const overrides: InternalKeycloakOverrides = {
+	navigate: navigateMock,
+	newDate
+};
+
 const doRender = (config?: RenderConfig) =>
 	render(
-		<KeycloakAuthProvider
-			realm={REALM}
-			authServerUrl={MOCK_AUTH_SERVER_URL}
-			clientId={CLIENT_ID}
-			requiredRoles={config?.requiredRoles}
-			localStorageKey={config?.localStorageKey}
-			doAccessDeniedRedirect={config?.doAccessDeniedRedirect}
-			accessDeniedUrl={config?.accessDeniedUrl}
-		>
-			<KeycloakRenderer />
-		</KeycloakAuthProvider>
+		<KeycloakAuthInternalContext.Provider value={overrides}>
+			<KeycloakAuthProvider
+				realm={REALM}
+				authServerUrl={MOCK_AUTH_SERVER_URL}
+				clientId={CLIENT_ID}
+				requiredRoles={config?.requiredRoles}
+				localStorageKey={config?.localStorageKey}
+				doAccessDeniedRedirect={config?.doAccessDeniedRedirect}
+				accessDeniedUrl={config?.accessDeniedUrl}
+			>
+				<KeycloakRenderer />
+			</KeycloakAuthProvider>
+		</KeycloakAuthInternalContext.Provider>
 	);
-
-const navigateMock = navigate as Mock<[string], void>;
 
 describe('KeycloakAuthProvider', () => {
 	beforeEach(() => {

@@ -18,14 +18,16 @@
   "scripts": {
     "prepare": "husky install",
     "lint": "craig-lint",
+    "typeCheck": "tsc --noEmit --project ./test/tsconfig.json",
     "force-build": "rm -rf lib && craig-multi-module && tsc --declaration --emitDeclarationOnly --outDir ./lib/types",
-    "build": "npm run lint && npm run test && npm run force-build",
+    "build": "npm run typeCheck && npm run lint && npm run test && npm run force-build",
     "test": "vitest"
   },
   "lint-staged": {
     "*.{ts,tsx}": "craig-lint"
   },
   "peerDependencies": {
+    "@craigmiller160/keycloak-js": "^1.0.0-beta",
     "react": "^18.2.0"
   },
   "devDependencies": {
@@ -40,16 +42,19 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@types/react": "^18.0.27",
+    "@types/testing-library__jest-dom": "^5.9.1",
+    "@vitejs/plugin-react-swc": "^3.3.2",
     "husky": "^8.0.3",
     "jsdom": "^21.1.0",
     "lint-staged": "^13.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "typescript": "^5.1.3",
-    "vitest": "^0.28.3"
+    "vite": "^4.4.9",
+    "vitest": "^0.34.2"
   },
   "dependencies": {
-    "@vitejs/plugin-react-swc": "^3.2.0",
+    "@craigmiller160/keycloak-js": "1.0.0-beta.4",
     "keycloak-js": "^20.0.3"
   }
 }

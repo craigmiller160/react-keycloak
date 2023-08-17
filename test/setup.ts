@@ -10,20 +10,10 @@ afterEach(() => {
 	cleanup();
 });
 
-vi.mock('../src/utils/newDate', () => {
-	const date = new Date();
-	return {
-		newDate: () => date
-	};
-});
-
-vi.mock('../src/utils/navigate', () => ({
-	navigate: vi.fn()
-}));
-
 vi.mock('keycloak-js', async () => {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const mock = (await vi.importActual('./mocks/MockKeycloak')) as any;
+	const mock = await vi.importActual<{ MockKeycloak: MockKeycloak }>(
+		'./mocks/MockKeycloak'
+	);
 	return {
 		default: mock.MockKeycloak
 	};
