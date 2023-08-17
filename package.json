@@ -52,7 +52,7 @@
     "vitest": "^0.28.3"
   },
   "dependencies": {
-    "@craigmiller160/keycloak-js": "1.0.0-beta.1",
+    "@craigmiller160/keycloak-js": "^1.0.0-beta",
     "keycloak-js": "^20.0.3"
   }
 }
