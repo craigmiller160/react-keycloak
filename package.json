@@ -23,7 +23,8 @@
   "devDependencies": {
     "@craigmiller160/js-config": "^1.0.0",
     "cross-env": "^7.0.3",
-    "jsdom": "^21.1.0"
+    "jsdom": "^21.1.0",
+    "vitest": "^0.34.3"
   },
   "dependencies": {
     "@craigmiller160/keycloak-js": "1.0.0",
