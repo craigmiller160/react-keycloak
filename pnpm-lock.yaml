@@ -14,8 +14,8 @@ dependencies:
 
 devDependencies:
   '@craigmiller160/js-config':
-    specifier: ^1.0.0
-    version: 1.0.0(cross-env@7.0.3)(vitest@0.34.3)
+    specifier: file:.yalc/@craigmiller160/js-config
+    version: file:.yalc/@craigmiller160/js-config(cross-env@7.0.3)(vitest@0.34.3)
   '@testing-library/jest-dom':
     specifier: ^5.16.5
     version: 5.17.0
@@ -87,77 +87,6 @@ packages:
   /@colors/colors@1.6.0:
     resolution: {integrity: sha512-Ir+AOibqzrIsL6ajt3Rz3LskB7OiMVHqltZmspbW/TJuTVuyOMirVqAkjfY6JISiLHgyNqicAC8AyHHGzNd/dA==}
     engines: {node: '>=0.1.90'}
-    dev: true
-
-  /@craigmiller160/js-config@1.0.0(cross-env@7.0.3)(vitest@0.34.3):
-    resolution: {integrity: sha512-47b4GL74SHtzm/Xayj45sdJOArsqbgwM4Y/OCMOxtpywCQeCwu5v3EqHoKh11sMXktnbmACGEEX75J4UE/dFCQ==}
-    hasBin: true
-    requiresBuild: true
-    peerDependencies:
-      '@relmify/jest-fp-ts': ^2.1.1
-      cross-env: ^7.0.3
-      cypress: '>=13.0.0'
-      vitest: ^0.34.3
-    peerDependenciesMeta:
-      '@relmify/jest-fp-ts':
-        optional: true
-      cypress:
-        optional: true
-    dependencies:
-      '@eslint/js': 8.56.0
-      '@swc/core': 1.3.103
-      '@tanstack/eslint-plugin-query': 5.17.7(eslint@8.56.0)(typescript@5.3.3)
-      '@typescript-eslint/eslint-plugin': 6.19.0(@typescript-eslint/parser@6.19.0)(eslint@8.56.0)(typescript@5.3.3)
-      '@typescript-eslint/parser': 6.19.0(eslint@8.56.0)(typescript@5.3.3)
-      '@vitejs/plugin-react-swc': 3.5.0(vite@4.5.1)
-      cross-env: 7.0.3
-      eslint: 8.56.0
-      eslint-config-prettier: 9.1.0(eslint@8.56.0)
-      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@6.19.0)(eslint-plugin-import@2.29.1)(eslint@8.56.0)
-      eslint-plugin-cypress: 2.15.1(eslint@8.56.0)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@6.19.0)(eslint-import-resolver-typescript@3.6.1)(eslint@8.56.0)
-      eslint-plugin-jest-dom: 5.1.0(eslint@8.56.0)
-      eslint-plugin-jsx-a11y: 6.8.0(eslint@8.56.0)
-      eslint-plugin-prettier: 5.1.3(eslint-config-prettier@9.1.0)(eslint@8.56.0)(prettier@3.2.2)
-      eslint-plugin-react: 7.33.2(eslint@8.56.0)
-      eslint-plugin-react-hooks: 4.6.0(eslint@8.56.0)
-      eslint-plugin-sonarjs: 0.21.0(eslint@8.56.0)
-      eslint-plugin-testing-library: 6.2.0(eslint@8.56.0)(typescript@5.3.3)
-      eslint-plugin-vitest: 0.3.20(@typescript-eslint/eslint-plugin@6.19.0)(eslint@8.56.0)(typescript@5.3.3)(vitest@0.34.3)
-      fp-ts: 2.16.2
-      globals: 13.24.0
-      husky: 8.0.3
-      io-ts: 2.2.21(fp-ts@2.16.2)
-      io-ts-reporters: 2.0.1(fp-ts@2.16.2)(io-ts@2.2.21)
-      jsdom: 22.1.0
-      lint-staged: 14.0.1
-      postcss: 8.4.33
-      prettier: 3.2.2
-      sass: 1.69.7
-      stylelint: 15.11.0(typescript@5.3.3)
-      stylelint-config-standard-scss: 11.1.0(postcss@8.4.33)(stylelint@15.11.0)
-      ts-pattern: 5.0.6
-      typescript: 5.3.3
-      vite: 4.5.1(sass@1.69.7)
-      vitest: 0.34.3(jsdom@21.1.0)
-      winston: 3.11.0
-    transitivePeerDependencies:
-      - '@swc/helpers'
-      - '@testing-library/dom'
-      - '@types/eslint'
-      - '@types/node'
-      - bufferutil
-      - canvas
-      - enquirer
-      - eslint-import-resolver-node
-      - eslint-import-resolver-webpack
-      - less
-      - lightningcss
-      - stylus
-      - sugarss
-      - supports-color
-      - terser
-      - utf-8-validate
     dev: true
 
   /@craigmiller160/keycloak-js@1.0.0:
@@ -5229,4 +5158,77 @@ packages:
   /yocto-queue@1.0.0:
     resolution: {integrity: sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==}
     engines: {node: '>=12.20'}
+    dev: true
+
+  file:.yalc/@craigmiller160/js-config(cross-env@7.0.3)(vitest@0.34.3):
+    resolution: {directory: .yalc/@craigmiller160/js-config, type: directory}
+    id: file:.yalc/@craigmiller160/js-config
+    name: '@craigmiller160/js-config'
+    hasBin: true
+    requiresBuild: true
+    peerDependencies:
+      '@relmify/jest-fp-ts': ^2.1.1
+      cross-env: ^7.0.3
+      cypress: '>=13.0.0'
+      vitest: ^0.34.3
+    peerDependenciesMeta:
+      '@relmify/jest-fp-ts':
+        optional: true
+      cypress:
+        optional: true
+    dependencies:
+      '@eslint/js': 8.56.0
+      '@swc/core': 1.3.103
+      '@tanstack/eslint-plugin-query': 5.17.7(eslint@8.56.0)(typescript@5.3.3)
+      '@typescript-eslint/eslint-plugin': 6.19.0(@typescript-eslint/parser@6.19.0)(eslint@8.56.0)(typescript@5.3.3)
+      '@typescript-eslint/parser': 6.19.0(eslint@8.56.0)(typescript@5.3.3)
+      '@vitejs/plugin-react-swc': 3.5.0(vite@4.5.1)
+      cross-env: 7.0.3
+      eslint: 8.56.0
+      eslint-config-prettier: 9.1.0(eslint@8.56.0)
+      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@6.19.0)(eslint-plugin-import@2.29.1)(eslint@8.56.0)
+      eslint-plugin-cypress: 2.15.1(eslint@8.56.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@6.19.0)(eslint-import-resolver-typescript@3.6.1)(eslint@8.56.0)
+      eslint-plugin-jest-dom: 5.1.0(eslint@8.56.0)
+      eslint-plugin-jsx-a11y: 6.8.0(eslint@8.56.0)
+      eslint-plugin-prettier: 5.1.3(eslint-config-prettier@9.1.0)(eslint@8.56.0)(prettier@3.2.2)
+      eslint-plugin-react: 7.33.2(eslint@8.56.0)
+      eslint-plugin-react-hooks: 4.6.0(eslint@8.56.0)
+      eslint-plugin-sonarjs: 0.21.0(eslint@8.56.0)
+      eslint-plugin-testing-library: 6.2.0(eslint@8.56.0)(typescript@5.3.3)
+      eslint-plugin-vitest: 0.3.20(@typescript-eslint/eslint-plugin@6.19.0)(eslint@8.56.0)(typescript@5.3.3)(vitest@0.34.3)
+      fp-ts: 2.16.2
+      globals: 13.24.0
+      husky: 8.0.3
+      io-ts: 2.2.21(fp-ts@2.16.2)
+      io-ts-reporters: 2.0.1(fp-ts@2.16.2)(io-ts@2.2.21)
+      jsdom: 22.1.0
+      lint-staged: 14.0.1
+      postcss: 8.4.33
+      prettier: 3.2.2
+      sass: 1.69.7
+      stylelint: 15.11.0(typescript@5.3.3)
+      stylelint-config-standard-scss: 11.1.0(postcss@8.4.33)(stylelint@15.11.0)
+      ts-pattern: 5.0.6
+      typescript: 5.3.3
+      vite: 4.5.1(sass@1.69.7)
+      vitest: 0.34.3(jsdom@21.1.0)
+      winston: 3.11.0
+    transitivePeerDependencies:
+      - '@swc/helpers'
+      - '@testing-library/dom'
+      - '@types/eslint'
+      - '@types/node'
+      - bufferutil
+      - canvas
+      - enquirer
+      - eslint-import-resolver-node
+      - eslint-import-resolver-webpack
+      - less
+      - lightningcss
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+      - utf-8-validate
     dev: true
