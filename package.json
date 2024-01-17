@@ -24,7 +24,11 @@
     "@craigmiller160/js-config": "^1.0.0",
     "cross-env": "^7.0.3",
     "jsdom": "^21.1.0",
-    "vitest": "^0.34.3"
+    "vitest": "^0.34.3",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "dependencies": {
     "@craigmiller160/keycloak-js": "1.0.0",
