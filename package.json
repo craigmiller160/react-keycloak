@@ -15,7 +15,9 @@
   "files": [
     "lib"
   ],
-  "scripts": {},
+  "scripts": {
+    "build": "c-validate && c-build-lib"
+  },
   "peerDependencies": {
     "@craigmiller160/keycloak-js": "1.0.0",
     "react": "^18.2.0"
