@@ -14,8 +14,8 @@ dependencies:
 
 devDependencies:
   '@craigmiller160/js-config':
-    specifier: ^1.0.1
-    version: 1.0.1(cross-env@7.0.3)(vitest@0.34.3)
+    specifier: ^1.0.14
+    version: 1.0.14(cross-env@7.0.3)(vitest@0.34.3)
   '@testing-library/jest-dom':
     specifier: ^5.16.5
     version: 5.17.0
@@ -25,9 +25,6 @@ devDependencies:
   '@types/react':
     specifier: ^18.0.27
     version: 18.2.48
-  '@types/testing-library__jest-dom':
-    specifier: ^5.9.1
-    version: 5.14.9
   cross-env:
     specifier: ^7.0.3
     version: 7.0.3
@@ -89,10 +86,9 @@ packages:
     engines: {node: '>=0.1.90'}
     dev: true
 
-  /@craigmiller160/js-config@1.0.1(cross-env@7.0.3)(vitest@0.34.3):
-    resolution: {integrity: sha512-i2YDpWz0CfYDSxEeZ9CNmyKy0R7LK2dVhDDcgl2jpsE5qqaDxWRWzJexEj/rzPnQaSpV4nfJJPU/lz7jQvDi0A==}
+  /@craigmiller160/js-config@1.0.14(cross-env@7.0.3)(vitest@0.34.3):
+    resolution: {integrity: sha512-lPpP3F6WKK+NWcY1CClI8gTRCyETUmzQpNLBgEWG+aWlngC7ec4EogHDWpmJgHf9cZemI8qdvIyJ2cyWLnSdfQ==}
     hasBin: true
-    requiresBuild: true
     peerDependencies:
       '@relmify/jest-fp-ts': ^2.1.1
       cross-env: ^7.0.3
