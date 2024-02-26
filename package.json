@@ -1,6 +1,6 @@
 {
   "name": "@craigmiller160/react-keycloak",
-  "version": "1.2.1",
+  "version": "1.2.2-beta",
   "sideEffects": false,
   "publishConfig": {
     "registry": "https://nexus-craigmiller160.ddns.net/repository/npm-private/"
@@ -17,18 +17,17 @@
   ],
   "scripts": {
     "build": "c-validate && c-build-lib",
-    "postinstall": "c-init"
+    "postinstall": "c-init node || echo 'No c-init'"
   },
   "peerDependencies": {
     "@craigmiller160/keycloak-js": "1.0.0",
     "react": "^18.2.0"
   },
   "devDependencies": {
-    "@craigmiller160/js-config": "^1.0.1",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
+    "@craigmiller160/js-config": "^1.0.15",
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^14.2.1",
     "@types/react": "^18.0.27",
-    "@types/testing-library__jest-dom": "^5.9.1",
     "cross-env": "^7.0.3",
     "jsdom": "^21.1.0",
     "react": "^18.2.0",
